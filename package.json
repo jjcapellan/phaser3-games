@@ -1,0 +1,24 @@
+{
+  "name": "phaser3-games",
+  "version": "0.1.0",
+  "description": "Browser games made with Phaser 3",
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.js",
+    "dev": "node scripts/dev.js",
+    "lint": "eslint games/**/src/index.js games/**/src/**/*.js"
+  },
+  "keywords": [
+    "phaser",
+    "games"
+  ],
+  "author": "Juan José Capellán",
+  "license": "MIT",
+  "dependencies": {
+    "phaser": "^3.70.0"
+  },
+  "devDependencies": {
+    "esbuild": "^0.19.10",
+    "eslint": "^8.56.0"
+  }
+}

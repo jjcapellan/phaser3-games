@@ -1,0 +1,2 @@
+# BROWSER GAMES
+This repository contains simple games mainly inspired by well-known classic games. These games are made in javascript using the Phaser 3 framework for learning and experimentation purposes.

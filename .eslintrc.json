@@ -1,0 +1,31 @@
+{
+    "root": true,
+    "extends": [
+        "eslint:recommended"
+    ],
+    "parserOptions": {
+        "ecmaVersion": 6,
+        "sourceType": "module"
+    },
+    "env": {
+        "browser": true,
+        "es6": true
+    },
+    "rules": {
+        "quotes": [
+            "error",
+            "double",
+            {
+                "avoidEscape": true,
+                "allowTemplateLiterals": true
+            }
+        ]
+    },
+    "globals": {
+        "IS_DEV": true,
+        "COLORS": true,
+        "CENTER": true,
+        "Phaser": true
+        
+    }
+}

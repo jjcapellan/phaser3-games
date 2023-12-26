@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phaser Games</title>
+
+    <style>
+        body {
+            background-color: #efefef;
+            padding: 1em;
+        }
+
+        .games {
+            height: 100vh;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .card {
+            width: 640px;
+            height: 360px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background-color: black;
+        }
+    </style>
+</head>
+
+<body>
+    <h1></h1>
+    <script>
+        fetch('games.json')
+            .then(response => response.json())
+            .then(render);
+
+        function render(data) {
+            const container = document.createElement("div");
+            container.classList.add(["games"]);
+
+            if(data.games.length == 0) return;
+
+            data.games.forEach(game => {
+                let div = document.createElement("div");
+                div.classList.add(['card']);
+
+                let anchor = document.createElement("a");
+                anchor.href = game.link;
+
+                let image = document.createElement("img");
+                image.src = game.image;
+                image.title = game.name;
+
+                anchor.appendChild(image);
+                div.appendChild(anchor);
+                container.appendChild(div);
+            });
+
+            document.body.appendChild(container);
+        }
+    </script>
+</body>
+
+</html>

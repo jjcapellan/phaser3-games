@@ -1,0 +1,5 @@
+# Node folder
+node_modules/
+
+# Map files
+*.map
