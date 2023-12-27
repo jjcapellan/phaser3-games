@@ -1,3 +1,9 @@
 {
-    "games": []
+    "games": [
+        {
+            "name": "test-game",
+            "description": "Minimal template for next games",
+            "image": ""
+        }
+    ]
 }

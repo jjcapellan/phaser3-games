@@ -44,12 +44,15 @@
 
             if(data.games.length == 0) return;
 
-            data.games.forEach(game => {
+            data.games.forEach((game, i) => {
+                // test-game not parsed
+                if(i == 0) return;
+
                 let div = document.createElement("div");
                 div.classList.add(['card']);
 
                 let anchor = document.createElement("a");
-                anchor.href = game.link;
+                anchor.href = "/games/" + game.name + "/";
 
                 let image = document.createElement("img");
                 image.src = game.image;
