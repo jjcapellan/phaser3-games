@@ -16,7 +16,7 @@ export default class Load extends Phaser.Scene {
             this.scene.start("menu");
         }, this);
 
-        this.load.atlas("atlas", "/assets/imgs/invader.png", "/assets/imgs/invader.png");
+        this.load.atlas("atlas", "/assets/imgs/invader.png", "/assets/imgs/invader.json");
         this.load.audio("menu-background", "/assets/sounds/loop_space_ambience_128.mp3");
 
         this.load.on("progress", this.updateText, this);
