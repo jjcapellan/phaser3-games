@@ -1,4 +1,4 @@
-import ScrollingLayer from "phaser3-scrollinglayer/dist/scrollinglayer.esm.js";
+import ScrollingLayer from "phaser3-scrollinglayer";
 
 export default class Menu extends Phaser.Scene {
     constructor() {

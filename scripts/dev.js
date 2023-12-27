@@ -17,6 +17,7 @@ let ctx = await esbuild.context({
     ],
     bundle: true,
     sourcemap: true,
+    mainFields: ["module", "main", "browser"],
     define: { IS_DEV: "true" },
     outdir: "games",
 });

@@ -17,6 +17,7 @@ await esbuild.build({
     ],
     bundle: true,
     sourcemap: false,
+    mainFields: ["module", "main", "browser"],
     define: { IS_DEV: "false" },
     outdir: "games",
 });
