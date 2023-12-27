@@ -80,12 +80,12 @@ export default class Menu extends Phaser.Scene {
             .setOrigin(0, 1);
 
         // Texts
-        this.add.bitmapText(window.centerX, window.centerY / 3 + 40, "pixelfont", "invader")
+        this.add.bitmapText(CENTER.x, CENTER.y / 3 + 40, "pixelfont", "invader")
             .setScale(8)
             .setTint(0x1a1c2c)
             .setOrigin(0.5);
 
-        this.add.bitmapText(window.centerX, window.centerY / 3 + 40 * 2, "pixelfont", "click to play")
+        this.add.bitmapText(CENTER.x, CENTER.y / 3 + 40 * 2, "pixelfont", "click to play")
             .setOrigin(0.5);
 
         // Mouse input
