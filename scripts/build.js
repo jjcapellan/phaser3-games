@@ -1,4 +1,5 @@
 import * as esbuild from "esbuild";
+import { inFile, outFile } from "./current.js";
 
 await esbuild.build({
     entryPoints: [
@@ -12,7 +13,7 @@ await esbuild.build({
 
 await esbuild.build({
     entryPoints: [
-        { out: "test-game/build/game", in: "games/test-game/src/index.js" }
+        { out: outFile, in: inFile }
     ],
     bundle: true,
     sourcemap: false,
