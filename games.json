@@ -2,8 +2,16 @@
     "games": [
         {
             "name": "test-game",
-            "description": "Minimal template for next games",
-            "image": ""
+            "description": "Minimal template for next games"
+        },
+        {
+            "name": "invader",
+            "description": "Game inspired in Space Invaders.",
+            "controls": [
+                {"key": "A", "action": "left"},
+                {"key": "D", "action": "right"},
+                {"key": "SPACE", "action": "shoot"}
+            ]            
         }
     ]
 }
