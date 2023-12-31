@@ -4,11 +4,11 @@ specifiers:
   esbuild: ^0.19.10
   eslint: ^8.56.0
   phaser: ^3.70.0
-  phaser3-scrollinglayer: ^2.0.2
+  phaser3-scrollinglayer: ^3.0.0
 
 dependencies:
   phaser: 3.70.0
-  phaser3-scrollinglayer: 2.0.2
+  phaser3-scrollinglayer: 3.0.0
 
 devDependencies:
   esbuild: 0.19.10
@@ -805,8 +805,8 @@ packages:
       eventemitter3: 5.0.1
     dev: false
 
-  /phaser3-scrollinglayer/2.0.2:
-    resolution: {integrity: sha512-5QdYs1KKDR6ZTAh6Et/t6hk5z6L6RPR56mnyrntIfxmIbBl+3vzaEtWINuEZePtJ2XjjKYLQlTAmfQgBGhiUuQ==}
+  /phaser3-scrollinglayer/3.0.0:
+    resolution: {integrity: sha512-HmDsTROJ4mQixYbCvHUvPIRJYtRbbm8dvaVP8cUUzL5SZhcmIrK6YegHlMzxJRiMAH2FXKxj4iUZTNoE87m5sw==}
     dev: false
 
   /prelude-ls/1.2.1:

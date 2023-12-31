@@ -1,4 +1,4 @@
-import ScrollingLayer from "phaser3-scrollinglayer";
+import LayerFactory from "phaser3-scrollinglayer";
 
 export default class Menu extends Phaser.Scene {
     constructor() {
@@ -64,16 +64,9 @@ export default class Menu extends Phaser.Scene {
             });
 
         // Fog effect
-        this.fog = new ScrollingLayer(
-            this,
-            -10,
-            "atlas",
-            {
-                frame: "Fog-0",
-                y: this.scale.height - 30,
-                overlap: 0,
-            }
-        );
+        this.add.existing(new LayerFactory(this, "atlas"))
+            .addHlayer(this.scale.height - 30, -10, "Fog-0")
+            .setOverlap(0);
 
         // First plane image
         this.add.image(0, this.scale.height, "atlas", "Ruins1-0")
@@ -127,7 +120,7 @@ export default class Menu extends Phaser.Scene {
         ship.setPosition(x, y);
     }
 
-    update(time, delta) {
+    update() {
         this.ships.forEach((ship) => {
             ship.y += ship.speed;
             ship.x += ship.speed;
@@ -135,6 +128,5 @@ export default class Menu extends Phaser.Scene {
                 this.resetShip(ship);
             }
         });
-        this.fog.update(delta);
     }
 }
