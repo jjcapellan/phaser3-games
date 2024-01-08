@@ -14,7 +14,6 @@ export default class Bullet extends Phaser.Physics.Arcade.Image {
 
     preUpdate(time, delta) {
         if (this.y > this.scene.scale.height || this.y < 0) {
-            this.setVelocityY(0);
             this.setActive(false);
             this.setVisible(false);
         }
