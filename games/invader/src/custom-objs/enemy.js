@@ -1,4 +1,6 @@
 import { genOscPositions } from "../utils.js";
+import Bullet from "./bullet.js";
+
 const MOVE_RANGE = 14;
 const FPS = 12;
 const TIME_PER_FRAME = 1000 / FPS;
@@ -20,16 +22,26 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
 
         // Initial position
         this.x = offsetX + anchor.x;
-        this.y = offsetY + Y_POSITIONS[this.yPosIdx] + anchor.y;        
+        this.y = offsetY + Y_POSITIONS[this.yPosIdx] + anchor.y;
 
         // Texture animation
         this.anims.create({ key: "enemy_idle", frames: this.anims.generateFrameNames("atlas", { prefix: "Enemy-", end: 4 }), repeat: -1 });
+        this.anims.create({ key: "enemy_shoot", frames: this.anims.generateFrameNames("atlas", { prefix: "Enemy-", start: 5, end: 8 }) });
         this.play("enemy_idle");
 
         // Physics configured only to allow collisions
         this.scene.physics.add.existing(this);
         this.enableBody();
         this.setDirectControl();
+
+        // Bullet
+        this.bullet = scene.add.existing(new Bullet(this, "Bullet-1", 200, scene));
+    }
+
+    shoot() {
+        this.chain(["enemy_shoot", "enemy_idle"]);
+        this.stop();
+        this.bullet.shoot();
     }
 
     preUpdate(time, delta) {
