@@ -1,4 +1,5 @@
 import LayerFactory from "phaser3-scrollinglayer";
+import { transition } from "../utils.js";
 
 export default class Menu extends Phaser.Scene {
     constructor() {
@@ -84,7 +85,8 @@ export default class Menu extends Phaser.Scene {
         // Mouse input
         this.input.on("pointerdown", () => {
             snd_background.stop();
-            this.scene.start("gameplay");
+            //this.scene.start("gameplay");
+            transition(this, "gameplay", 2000);
         });
     }
 
