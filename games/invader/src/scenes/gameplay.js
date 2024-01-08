@@ -12,11 +12,11 @@ export default class GamePlay extends Phaser.Scene {
             y: CENTER.y
         };
 
-        this.add.image(0, 0, "atlas", "Background-0").setOrigin(0);
-        this.add.image(0, this.scale.height, "atlas", "Ruins3-0").setOrigin(0, 1); 
+        this.add.image(0, 0, "atlas", "Background-0").setOrigin(0).setTint(0x888888);
+        this.add.image(0, this.scale.height, "atlas", "Ruins3-0").setOrigin(0, 1).setTint(0x666666); 
         this.add.existing(new Player(this, CENTER.x, this.scale.height - 20));
         this.add.existing(new Enemy(this, 0, 0, this.anchor));
-        this.add.image(0, this.scale.height, "atlas", "Floor-0").setOrigin(0, 1);               
+        this.add.image(0, this.scale.height, "atlas", "Floor-0").setOrigin(0, 1);          
         
     }
 }
