@@ -4,10 +4,11 @@ const PLAYER_SPEED = 120;
 export default class Player extends Phaser.Physics.Arcade.Sprite {
 
     constructor(scene, x, y) {
-        super(scene, x, y, "atlas", "Player-0");  
+        super(scene, x, y, "atlas", "Player-0");
 
         // Texture animation
         this.anims.create({ key: "player_idle", frames: this.anims.generateFrameNames("atlas", { prefix: "Player-", end: 5 }), repeat: -1 });
+        this.anims.create({ key: "player_shoot", frames: this.anims.generateFrameNames("atlas", { prefix: "Player-", start: 6, end: 9 }) });
         this.play("player_idle");
 
         // Physics
@@ -26,13 +27,15 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
     preUpdate(time, delta) {
         super.preUpdate(time, delta);
-        if(Phaser.Input.Keyboard.JustDown(this.shootKey)){
+        if (Phaser.Input.Keyboard.JustDown(this.shootKey)) {
+            this.chain(["player_shoot", "player_idle"]);
+            this.stop();
             this.bullet.shoot();
         }
-        if(this.leftKey.isDown){
+        if (this.leftKey.isDown) {
             this.setVelocityX(-PLAYER_SPEED);
         }
-        if(this.rightKey.isDown){
+        if (this.rightKey.isDown) {
             this.setVelocityX(PLAYER_SPEED);
         }
     }
