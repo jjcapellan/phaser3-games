@@ -21,7 +21,6 @@ export default class Bullet extends Phaser.Physics.Arcade.Image {
     }
 
     shoot() {
-        if (this.body.velocity.y) return;
         this.body.reset(this.shooter.x, this.shooter.y);
         this.setActive(true);
         this.setVisible(true);

@@ -27,7 +27,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
     preUpdate(time, delta) {
         super.preUpdate(time, delta);
-        if (Phaser.Input.Keyboard.JustDown(this.shootKey)) {
+        if (Phaser.Input.Keyboard.JustDown(this.shootKey) && !this.bullet.active) {
             this.chain(["player_shoot", "player_idle"]);
             this.stop();
             this.bullet.shoot();
