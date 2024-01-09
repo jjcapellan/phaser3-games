@@ -88,4 +88,33 @@ export default class Enemies extends Phaser.Physics.Arcade.Group {
             });
         }
     }
+
+    shoot() {
+
+        const enemies = this.getMatching("active", true);
+
+        // Each element represents one column. 1 == free column, 0 == shooter selected
+        const slots = [];
+        slots.length = ROW_SIZE;
+        slots.fill(1);
+
+        const shooters = [];
+
+        for (let i = enemies.length - 1; i >= 0; i--) {
+            const enemy = enemies[i];
+            const column = enemy.column;
+            if (slots[column] == 1) {
+                slots[column] = 0;
+                shooters.push(enemy);
+            }
+            if (shooters.length == ROW_SIZE) {
+                break;
+            }
+        } // End for
+
+        // Choose one front shooter 
+        const shooter = Phaser.Math.RND.pick(shooters);
+
+        shooter.shoot();
+    }
 }
