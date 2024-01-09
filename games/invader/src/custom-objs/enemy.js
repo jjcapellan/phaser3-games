@@ -40,7 +40,8 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     shoot() {
         this.chain(["enemy_shoot", "enemy_idle"]);
         this.stop();
-        this.bullets.get().shoot(this.x, this.y);
+        let b = this.bullets.getFirst();
+        if (b) b.shoot(this.x, this.y);
     }
 
     preUpdate(time, delta) {
