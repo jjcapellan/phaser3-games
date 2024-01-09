@@ -8,6 +8,9 @@ export default class Bullet extends Phaser.Physics.Arcade.Image {
         this.enableBody();
         this.speed = speed;
 
+        // Necessary to use group.get()
+        this.active = false;
+
     }
 
     preUpdate(time, delta) {
