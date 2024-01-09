@@ -29,7 +29,7 @@ export default class Enemies extends Phaser.Physics.Arcade.Group {
         this.direction = DIRECTION.right;
 
         // Bullets pool
-        const bullets = scene.physics.add.group();
+        const bullets = scene.physics.add.group({ classType: Bullet });
         for (let i = 0; i < BULLETS_POOL_SIZE; i++) {
             bullets.add(new Bullet("Bullet-1", BULLET_SPEED, scene));
         }
