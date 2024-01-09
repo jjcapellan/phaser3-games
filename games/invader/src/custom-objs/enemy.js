@@ -1,5 +1,4 @@
 import { genOscPositions } from "../utils.js";
-import Bullet from "./bullet.js";
 
 const MOVE_RANGE = 14;
 const FPS = 12;
@@ -8,7 +7,7 @@ const Y_POSITIONS = genOscPositions(MOVE_RANGE);
 
 export default class Enemy extends Phaser.Physics.Arcade.Sprite {
 
-    constructor(scene, offsetX, offsetY, anchor) {
+    constructor(scene, offsetX, offsetY, anchor, bullets) {
         super(scene, 0, 0, "atlas", "Enemy-0");
 
         // This object position is relative to the anchor object
@@ -34,14 +33,14 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
         this.enableBody();
         this.setDirectControl();
 
-        // Bullet
-        this.bullet = scene.add.existing(new Bullet("Bullet-1", 200, scene));
+        // Bullets pool
+        this.bullets = bullets;
     }
 
     shoot() {
         this.chain(["enemy_shoot", "enemy_idle"]);
         this.stop();
-        this.bullet.shoot(this.x, this.y);
+        this.bullets.get().shoot(this.x, this.y);
     }
 
     preUpdate(time, delta) {
