@@ -52,6 +52,7 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
             this.yPosIdx = Phaser.Math.Wrap(++this.yPosIdx, 0, Y_POSITIONS.length);
             this.setY(this.offsetY + Y_POSITIONS[this.yPosIdx] + this.anchor.y);
         }
+        this.setX(this.anchor.x + this.offsetX);
     }
 
 } // End class Enemy
