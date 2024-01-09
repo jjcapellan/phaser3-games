@@ -17,7 +17,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this.setDragX(PLAYER_SPEED * 1.8);
 
         // Bullet
-        this.bullet = scene.add.existing(new Bullet(this, "Bullet-0", -200, scene));
+        this.bullet = scene.add.existing(new Bullet("Bullet-0", -200, scene));
 
         // Controls
         this.leftKey = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
@@ -30,7 +30,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         if (Phaser.Input.Keyboard.JustDown(this.shootKey) && !this.bullet.active) {
             this.chain(["player_shoot", "player_idle"]);
             this.stop();
-            this.bullet.shoot();
+            this.bullet.shoot(this.x, this.y);
         }
         if (this.leftKey.isDown) {
             this.setVelocityX(-PLAYER_SPEED);

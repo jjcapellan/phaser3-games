@@ -1,9 +1,7 @@
 export default class Bullet extends Phaser.Physics.Arcade.Image {
 
-    constructor(shooter, frame, speed, scene) {
+    constructor(frame, speed, scene) {
         super(scene, -1000, -1000, "atlas", frame);
-
-        this.shooter = shooter;
 
         // Physics
         this.scene.physics.add.existing(this);
@@ -19,8 +17,8 @@ export default class Bullet extends Phaser.Physics.Arcade.Image {
         }
     }
 
-    shoot() {
-        this.body.reset(this.shooter.x, this.shooter.y);
+    shoot(x, y) {
+        this.body.reset(x, y);
         this.setActive(true);
         this.setVisible(true);
         this.setVelocityY(this.speed);

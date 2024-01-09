@@ -35,13 +35,13 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
         this.setDirectControl();
 
         // Bullet
-        this.bullet = scene.add.existing(new Bullet(this, "Bullet-1", 200, scene));
+        this.bullet = scene.add.existing(new Bullet("Bullet-1", 200, scene));
     }
 
     shoot() {
         this.chain(["enemy_shoot", "enemy_idle"]);
         this.stop();
-        this.bullet.shoot();
+        this.bullet.shoot(this.x, this.y);
     }
 
     preUpdate(time, delta) {
