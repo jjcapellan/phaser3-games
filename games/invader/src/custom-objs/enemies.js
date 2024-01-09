@@ -1,12 +1,15 @@
+import Bullet from "./bullet.js";
 import Enemy from "./enemy.js";
 
-const ROW_SIZE = 11;    // elements
-const COLUMN_SIZE = 4;  // elements
-const ITEM_PADDING = 8; // px
-const ITEM_WIDTH = 24;  // width == height (px)
-const GROUP_MARGIN = 6; // px
-const SPEED_INIT = 20;  // px / sec
-const SPEED_STEP = 5;  // px / sec
+const ROW_SIZE = 11;         // elements
+const COLUMN_SIZE = 4;       // elements
+const ITEM_PADDING = 8;      // px
+const ITEM_WIDTH = 24;       // width == height (px)
+const GROUP_MARGIN = 6;      // px
+const SPEED_INIT = 20;       // px / sec
+const SPEED_STEP = 5;        // px / sec
+const BULLET_SPEED = 200;    // px / sec
+const BULLETS_POOL_SIZE = 4; // elements
 const DIRECTION = {
     left: -1,
     right: 1
@@ -25,6 +28,13 @@ export default class Enemies extends Phaser.Physics.Arcade.Group {
         this.speed = SPEED_INIT;
         this.direction = DIRECTION.right;
 
+        // Bullets pool
+        const bullets = scene.physics.add.group();
+        for (let i = 0; i < BULLETS_POOL_SIZE; i++) {
+            bullets.add(new Bullet("Bullet-1", BULLET_SPEED, scene));
+        }
+
+
         // Add enemies to the group
         const offsetX0 = - (ROW_SIZE * ITEM_WIDTH + (ROW_SIZE - 1) * ITEM_PADDING) / 2 + ITEM_WIDTH / 2;
         const offsetY0 = - (COLUMN_SIZE * ITEM_WIDTH + (COLUMN_SIZE - 1) * ITEM_PADDING) / 2 + GROUP_MARGIN + ITEM_WIDTH / 2;
@@ -34,7 +44,8 @@ export default class Enemies extends Phaser.Physics.Arcade.Group {
                     scene,
                     offsetX0 + j * (ITEM_PADDING + ITEM_WIDTH),
                     offsetY0 + i * (ITEM_PADDING + ITEM_WIDTH),
-                    this.anchor
+                    this.anchor,
+                    bullets
                 );
                 this.add(enemy, true);
             }
