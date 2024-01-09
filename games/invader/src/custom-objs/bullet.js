@@ -13,7 +13,7 @@ export default class Bullet extends Phaser.Physics.Arcade.Image {
 
         // Add this object to updateList and displayList. Not necessary if added using add.existing()
         this.addToUpdateList();
-        this.addToUpdateList();
+        this.addToDisplayList();
 
     }
 
