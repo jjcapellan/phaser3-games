@@ -1,4 +1,3 @@
-import Enemy from "../custom-objs/enemy.js";
 import Player from "../custom-objs/player.js";
 import Enemies from "../custom-objs/enemies.js";
 
