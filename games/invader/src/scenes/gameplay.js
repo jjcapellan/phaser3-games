@@ -50,5 +50,9 @@ export default class GamePlay extends Phaser.Scene {
             explodeSound.play();
             enemy.explode();
         });
+
+        this.physics.add.collider(player, [enemies.bullets, enemies], () => {
+            console.log("game over");
+        })
     }
 }

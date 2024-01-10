@@ -29,9 +29,9 @@ export default class Enemies extends Phaser.Physics.Arcade.Group {
         this.direction = DIRECTION.right;
 
         // Bullets pool
-        const bullets = scene.physics.add.group({ classType: Bullet });
+        this.bullets = scene.physics.add.group({ classType: Bullet });
         for (let i = 0; i < BULLETS_POOL_SIZE; i++) {
-            bullets.add(new Bullet("Bullet-1", BULLET_SPEED, scene));
+            this.bullets.add(new Bullet("Bullet-1", BULLET_SPEED, scene));
         }
 
         // Explosion effect on the ground
@@ -59,7 +59,7 @@ export default class Enemies extends Phaser.Physics.Arcade.Group {
                     offsetX0 + j * (ITEM_PADDING + ITEM_WIDTH),
                     offsetY0 + i * (ITEM_PADDING + ITEM_WIDTH),
                     this.anchor,
-                    bullets
+                    this.bullets
                 );
 
                 // column will be used to pickup front shooters
