@@ -10,6 +10,8 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     constructor(scene, offsetX, offsetY, anchor, bullets) {
         super(scene, 0, 0, "atlas", "Enemy-0");
 
+        this.scene = scene;
+
         // This object position is relative to the anchor object
         this.anchor = anchor;
         this.offsetX = offsetX;
@@ -46,14 +48,25 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     }
 
     explode() {
-        this.on("animationcomplete-enemy_explode", () => {
-            this.parentGroup.remove(this, true);
-        });
+        this.setDirectControl(false);
+        this.body.setGravityY(100);
+        this.body.setVelocityX(0);
+        this.body.setAngularVelocity(Phaser.Math.Between(-30, 30));
         this.play("enemy_explode");
     }
 
     preUpdate(time, delta) {
         super.preUpdate(time, delta);
+        if (this.body.gravity.y > 0) {
+            if (this.y > this.scene.scale.height - 4) {
+                this.parentGroup.remove(this);
+                this.body.setGravityY(0);
+                this.body.reset(this.x, this.y);
+                this.body.setEnable = false;
+                this.active = false;
+            }
+            return;
+        };
         this.countDown -= delta;
         if (this.countDown < 0) {
             this.countDown = TIME_PER_FRAME;
