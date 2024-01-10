@@ -45,6 +45,9 @@ export default class Enemies extends Phaser.Physics.Arcade.Group {
             emitting: false
         });
 
+        // Shoot sound
+        const snd_shoot = scene.sound.add("laser2");
+
 
         // Add enemies to the group
         const offsetX0 = - (ROW_SIZE * ITEM_WIDTH + (ROW_SIZE - 1) * ITEM_PADDING) / 2 + ITEM_WIDTH / 2;
@@ -67,6 +70,9 @@ export default class Enemies extends Phaser.Physics.Arcade.Group {
 
                 // Particle emmiter
                 enemy.emitter = this.expl;
+
+                // Shoot sound
+                enemy.shootSound = snd_shoot;
 
                 this.add(enemy, true);
             }

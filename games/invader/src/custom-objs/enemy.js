@@ -44,7 +44,10 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
         this.chain(["enemy_shoot", "enemy_idle"]);
         this.stop();
         let b = this.bullets.getFirst();
-        if (b) b.shoot(this.x, this.y);
+        if (b) {
+            this.shootSound.play();
+            b.shoot(this.x, this.y);
+        }
     }
 
     explode() {
