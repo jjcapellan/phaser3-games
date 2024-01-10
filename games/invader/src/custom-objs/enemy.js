@@ -48,9 +48,10 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     }
 
     explode() {
+        this.parentGroup.remove(this);
         this.setDirectControl(false);
         this.body.setGravityY(100);
-        this.body.setVelocityX(0);
+        //this.body.setVelocityX(0);
         this.body.setAngularVelocity(Phaser.Math.Between(-30, 30));
         this.play("enemy_explode");
     }
@@ -59,7 +60,7 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
         super.preUpdate(time, delta);
         if (this.body.gravity.y > 0) {
             if (this.y > this.scene.scale.height - 4) {
-                this.parentGroup.remove(this);
+                
                 this.body.setGravityY(0);
                 this.body.reset(this.x, this.y);
                 this.body.setEnable = false;
