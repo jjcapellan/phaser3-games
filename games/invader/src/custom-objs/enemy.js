@@ -26,6 +26,7 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
         // Texture animation
         this.anims.create({ key: "enemy_idle", frames: this.anims.generateFrameNames("atlas", { prefix: "Enemy-", end: 4 }), repeat: -1 });
         this.anims.create({ key: "enemy_shoot", frames: this.anims.generateFrameNames("atlas", { prefix: "Enemy-", start: 5, end: 8 }) });
+        this.anims.create({ key: "enemy_explode", frames: this.anims.generateFrameNames("atlas", { prefix: "Enemy-", start: 9, end: 14 }), frameRate: 5 });
         this.play("enemy_idle");
 
         // Physics configured only to allow collisions
@@ -42,6 +43,13 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
         this.stop();
         let b = this.bullets.getFirst();
         if (b) b.shoot(this.x, this.y);
+    }
+
+    explode() {
+        this.on("animationcomplete-enemy_explode", () => {
+            this.parentGroup.remove(this, true);
+        });
+        this.play("enemy_explode");
     }
 
     preUpdate(time, delta) {
