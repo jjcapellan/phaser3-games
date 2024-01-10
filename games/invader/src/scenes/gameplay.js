@@ -20,6 +20,16 @@ export default class GamePlay extends Phaser.Scene {
         const enemies = this.add.existing(new Enemies(this));
         this.add.image(0, this.scale.height, "atlas", "Floor-0").setOrigin(0, 1);
 
+        // One enemy shoot per second
+        this.time.addEvent({ 
+            delay: 1000, 
+            callback: () => {
+                enemies.shoot();
+            },
+            callbackScope: this,
+            loop: true
+        });
+
         // Explosion effect
         const expl = this.add.particles(0, 0, "atlas", {
             frame: "Particle-yellow",
