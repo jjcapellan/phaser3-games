@@ -14,7 +14,6 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         // Physics
         this.scene.physics.add.existing(this);
         this.enableBody();
-        this.setDragX(PLAYER_SPEED * 1.8);
 
         // Bullet
         this.bullet = scene.add.existing(new Bullet("Bullet-0", -200, scene));
@@ -38,10 +37,13 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         }
         if (this.leftKey.isDown) {
             this.setVelocityX(-PLAYER_SPEED);
+            return;
         }
         if (this.rightKey.isDown) {
             this.setVelocityX(PLAYER_SPEED);
+            return;
         }
+        this.setVelocityX(0);
     }
 
 } // End class Player
