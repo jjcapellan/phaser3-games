@@ -64,6 +64,7 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
                 this.body.reset(this.x, this.y);
                 this.body.setEnable(false);
                 this.active = false;
+                this.emitter.emitParticle(10, this.x, this.y);
             }
             return;
         };

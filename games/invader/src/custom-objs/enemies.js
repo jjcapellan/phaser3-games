@@ -34,6 +34,17 @@ export default class Enemies extends Phaser.Physics.Arcade.Group {
             bullets.add(new Bullet("Bullet-1", BULLET_SPEED, scene));
         }
 
+        // Explosion effect on the ground
+        this.expl = scene.add.particles(0, 0, "atlas", {
+            frame: "Smoke-0",
+            lifespan: 1000,
+            speed: { min: 10, max: 20 },
+            scale: { max: 2, min: 0.5 },
+            alpha: { start: 1, end: 0 },
+            gravityY: 4,
+            emitting: false
+        });
+
 
         // Add enemies to the group
         const offsetX0 = - (ROW_SIZE * ITEM_WIDTH + (ROW_SIZE - 1) * ITEM_PADDING) / 2 + ITEM_WIDTH / 2;
@@ -53,6 +64,9 @@ export default class Enemies extends Phaser.Physics.Arcade.Group {
 
                 // Reference to remove itself
                 enemy.parentGroup = this;
+
+                // Particle emmiter
+                enemy.emitter = this.expl;
 
                 this.add(enemy, true);
             }
