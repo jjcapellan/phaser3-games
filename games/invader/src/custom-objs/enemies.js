@@ -51,6 +51,9 @@ export default class Enemies extends Phaser.Physics.Arcade.Group {
                 // column will be used to pickup front shooters
                 enemy.column = j;
 
+                // Reference to remove itself
+                enemy.parentGroup = this;
+
                 this.add(enemy, true);
             }
         }
