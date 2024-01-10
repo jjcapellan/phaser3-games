@@ -32,6 +32,14 @@
         "h": 2
       }
     },
+    "Particle-yellow":{
+      "frame": {
+        "x": 6,
+        "y": 709,
+        "w": 2,
+        "h": 2
+      }
+    },
     "Ruins3-0": {
       "frame": {
         "x": 0,
