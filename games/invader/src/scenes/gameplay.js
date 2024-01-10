@@ -12,6 +12,8 @@ export default class GamePlay extends Phaser.Scene {
             y: CENTER.y
         };
 
+        const explodeSound = this.sound.add("explode2");
+
         
 
         this.add.image(0, 0, "atlas", "Background-0").setOrigin(0).setTint(0x888888);
@@ -45,6 +47,7 @@ export default class GamePlay extends Phaser.Scene {
         this.physics.add.collider(player.bullet, enemies, (bullet, enemy) => {
             bullet.reset();
             expl.emitParticle(40, enemy.x, enemy.y);
+            explodeSound.play();
             enemy.explode();
         });
     }
