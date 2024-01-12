@@ -12,6 +12,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         // Physics
         this.scene.physics.add.existing(this);
         this.enableBody();
+        this.setCollideWorldBounds(true);
 
         // Bullet
         this.bullet = scene.add.existing(new Bullet("Bullet-0", -200, scene));
