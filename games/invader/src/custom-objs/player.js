@@ -21,9 +21,6 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this.leftKey = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
         this.rightKey = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
         this.shootKey = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
-
-        // Shoot sound
-        this.shootSound = this.scene.sound.add("laser1");
     }
 
     preUpdate(time, delta) {
@@ -31,7 +28,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         if (Phaser.Input.Keyboard.JustDown(this.shootKey) && !this.bullet.active) {
             this.chain(["player_shoot", "player_idle"]);
             this.stop();
-            this.shootSound.play();
+            this.scene.sound.play("player_shoot");
             this.bullet.shoot(this.x, this.y);
         }
         if (this.leftKey.isDown) {

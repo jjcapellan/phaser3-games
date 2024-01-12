@@ -12,8 +12,6 @@ export default class GamePlay extends Phaser.Scene {
             y: CENTER.y
         };
 
-        const explodeSound = this.sound.add("explode2");
-
         // Global animations
         this.anims.create({ key: "enemy_idle", frames: this.anims.generateFrameNames("atlas", { prefix: "Enemy-", end: 4 }), repeat: -1 });
         this.anims.create({ key: "enemy_shoot", frames: this.anims.generateFrameNames("atlas", { prefix: "Enemy-", start: 5, end: 8 }) });
@@ -21,6 +19,13 @@ export default class GamePlay extends Phaser.Scene {
         this.anims.create({ key: "player_idle", frames: this.anims.generateFrameNames("atlas", { prefix: "Player-", end: 5 }), repeat: -1 });
         this.anims.create({ key: "player_shoot", frames: this.anims.generateFrameNames("atlas", { prefix: "Player-", start: 6, end: 9 }) });
         this.anims.create({ key: "player_hit", frames: this.anims.generateFrameNames("atlas", { prefix: "Player-", start: 10, end: 12 }), frameRate: 3 });
+
+        // Global sounds
+        this.sound.add("player_shoot");
+        this.sound.add("enemy_shoot");
+        this.sound.add("ground");
+        this.sound.add("explode");
+        
 
         this.add.image(0, 0, "atlas", "Background-0").setOrigin(0).setTint(0x888888);
         this.add.image(0, this.scale.height, "atlas", "Ruins3-0").setOrigin(0, 1).setTint(0x666666);
@@ -54,7 +59,7 @@ export default class GamePlay extends Phaser.Scene {
         this.physics.add.collider(player.bullet, this.enemies.activeEnemies, (bullet, enemy) => {
             bullet.reset();
             expl.emitParticle(40, enemy.x, enemy.y);
-            explodeSound.play();
+            this.sound.play("explode");
             this.enemies.explode(enemy);
         });
 

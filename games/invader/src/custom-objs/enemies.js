@@ -53,16 +53,12 @@ export default class Enemies {
             alpha: { start: 1, end: 0 },
             gravityY: 4,
             emitting: false
-        });
-
-        // Shoot sound
-        this.snd_shoot = scene.sound.add("laser2");
-        this.snd_ground = scene.sound.add("explode");
+        });        
 
         this.scene.physics.world.on("worldbounds", (body, up, down) => {
             if (down) {
                 body.enable = false;
-                this.snd_ground.play();
+                this.scene.sound.play("ground");
                 this.expl.emitParticle(10, body.x, body.y);
             }
         });
@@ -192,7 +188,7 @@ export default class Enemies {
         shooter.stop();
         let b = this.bullets.getFirst();
         if (b) {
-            this.snd_shoot.play();
+            this.scene.sound.play("enemy_shoot");
             b.shoot(shooter.x, shooter.y);
         }
     }
