@@ -14,19 +14,26 @@ export default class GamePlay extends Phaser.Scene {
 
         const explodeSound = this.sound.add("explode2");
 
-        
+        // Global animations
+        this.anims.create({ key: "enemy_idle", frames: this.anims.generateFrameNames("atlas", { prefix: "Enemy-", end: 4 }), repeat: -1 });
+        this.anims.create({ key: "enemy_shoot", frames: this.anims.generateFrameNames("atlas", { prefix: "Enemy-", start: 5, end: 8 }) });
+        this.anims.create({ key: "enemy_explode", frames: this.anims.generateFrameNames("atlas", { prefix: "Enemy-", start: 9, end: 14 }), frameRate: 5 });
+        this.anims.create({ key: "player_idle", frames: this.anims.generateFrameNames("atlas", { prefix: "Player-", end: 5 }), repeat: -1 });
+        this.anims.create({ key: "player_shoot", frames: this.anims.generateFrameNames("atlas", { prefix: "Player-", start: 6, end: 9 }) });
+        this.anims.create({ key: "player_hit", frames: this.anims.generateFrameNames("atlas", { prefix: "Player-", start: 10, end: 12 }), frameRate: 4 });
 
         this.add.image(0, 0, "atlas", "Background-0").setOrigin(0).setTint(0x888888);
         this.add.image(0, this.scale.height, "atlas", "Ruins3-0").setOrigin(0, 1).setTint(0x666666);
         const player = this.add.existing(new Player(this, CENTER.x, this.scale.height - 20));
-        const enemies = this.add.existing(new Enemies(this));
+        this.enemies = new Enemies(this); //this.add.existing(new Enemies(this));
         this.add.image(0, this.scale.height, "atlas", "Floor-0").setOrigin(0, 1);
+        console.log(this.enemies);
 
         // One enemy shoot per second
-        this.time.addEvent({ 
-            delay: 1000, 
+        this.time.addEvent({
+            delay: 1000,
             callback: () => {
-                enemies.shoot();
+                this.enemies.shoot();
             },
             callbackScope: this,
             loop: true
@@ -44,15 +51,19 @@ export default class GamePlay extends Phaser.Scene {
             rotate: { max: 359, min: 0 }
         });
 
-        this.physics.add.collider(player.bullet, enemies, (bullet, enemy) => {
+        this.physics.add.collider(player.bullet, this.enemies.activeEnemies, (bullet, enemy) => {
             bullet.reset();
             expl.emitParticle(40, enemy.x, enemy.y);
             explodeSound.play();
-            enemy.explode();
+            this.enemies.explode(enemy);
         });
 
-        this.physics.add.collider(player, [enemies.bullets, enemies], () => {
+        this.physics.add.collider(player, [this.enemies.bullets, this.enemies.activeEnemies], () => {
             console.log("game over");
-        })
+        });
+    }
+
+    update(time, delta) {
+        this.enemies.update(delta);
     }
 }

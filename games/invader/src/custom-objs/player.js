@@ -7,9 +7,6 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         super(scene, x, y, "atlas", "Player-0");
 
         // Texture animation
-        this.anims.create({ key: "player_idle", frames: this.anims.generateFrameNames("atlas", { prefix: "Player-", end: 5 }), repeat: -1 });
-        this.anims.create({ key: "player_shoot", frames: this.anims.generateFrameNames("atlas", { prefix: "Player-", start: 6, end: 9 }) });
-        this.anims.create({ key: "player_hit", frames: this.anims.generateFrameNames("atlas", { prefix: "Player-", start: 10, end: 12 }), frameRate: 4 })
         this.play("player_idle");
 
         // Physics

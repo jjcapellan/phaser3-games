@@ -1,5 +1,10 @@
 import Bullet from "./bullet.js";
-import Enemy from "./enemy.js";
+import { genOscPositions } from "../utils.js";
+
+const MOVE_RANGE = 14;
+const FPS = 12;
+const TIME_PER_FRAME = 1000 / FPS;
+const Y_POSITIONS = genOscPositions(MOVE_RANGE);
 
 const ROW_SIZE = 11;         // elements
 const COLUMN_SIZE = 4;       // elements
@@ -15,15 +20,20 @@ const DIRECTION = {
     right: 1
 };
 
-export default class Enemies extends Phaser.Physics.Arcade.Group {
+export default class Enemies {
     constructor(scene) {
-        super(scene.physics.world, scene);
+
+        this.activeEnemies = [];
+        this.fallingEnemies = [];
+        this.scene = scene;
 
         // Movement reference point.
         this.anchor = {
             x: scene.scale.width / 2,
             y: (COLUMN_SIZE * ITEM_WIDTH + (COLUMN_SIZE - 1) * ITEM_PADDING) / 2 + GROUP_MARGIN
         };
+
+        this.countDown = TIME_PER_FRAME;
 
         this.speed = SPEED_INIT;
         this.direction = DIRECTION.right;
@@ -45,48 +55,75 @@ export default class Enemies extends Phaser.Physics.Arcade.Group {
             emitting: false
         });
 
-        // Shoot sound
-        const snd_shoot = scene.sound.add("laser2");
+        this.scene.physics.world.on("worldbounds", (body, up, down) => {
+            if (down) {
+                body.enable = false;
+                this.expl.emitParticle(10, body.x, body.y);
+            }
+        });
 
+        // Shoot sound
+        this.snd_shoot = scene.sound.add("laser2");
 
         // Add enemies to the group
         const offsetX0 = - (ROW_SIZE * ITEM_WIDTH + (ROW_SIZE - 1) * ITEM_PADDING) / 2 + ITEM_WIDTH / 2;
         const offsetY0 = - (COLUMN_SIZE * ITEM_WIDTH + (COLUMN_SIZE - 1) * ITEM_PADDING) / 2 + GROUP_MARGIN + ITEM_WIDTH / 2;
         for (let i = 0; i < COLUMN_SIZE; i++) {
             for (let j = 0; j < ROW_SIZE; j++) {
-                let enemy = new Enemy(
-                    scene,
-                    offsetX0 + j * (ITEM_PADDING + ITEM_WIDTH),
-                    offsetY0 + i * (ITEM_PADDING + ITEM_WIDTH),
-                    this.anchor,
-                    this.bullets
-                );
 
-                // column will be used to pickup front shooters
+                let enemy = scene.physics.add.sprite(0, 0, "atlas", "Enemy-0");
+
+                // Offsets
+                enemy.offsetX = offsetX0 + j * (ITEM_PADDING + ITEM_WIDTH);
+                enemy.offsetY = offsetY0 + i * (ITEM_PADDING + ITEM_WIDTH);
+
+                // Column position
                 enemy.column = j;
 
-                // Reference to remove itself
-                enemy.parentGroup = this;
+                // Initial Y_POSITIONS index
+                enemy.yPosIdx = Phaser.Math.Between(0, Y_POSITIONS.length - 1);
 
-                // Particle emmiter
-                enemy.emitter = this.expl;
+                // Initial position
+                enemy.setX(enemy.offsetX + this.anchor.x);
+                enemy.setY(enemy.offsetY + Y_POSITIONS[enemy.yPosIdx] + this.anchor.y);
 
-                // Shoot sound
-                enemy.shootSound = snd_shoot;
+                // Activate animation
+                enemy.play("enemy_idle");
 
-                this.add(enemy, true);
+                // Physics configured only to allow collisions
+                enemy.enableBody();
+                enemy.setDirectControl(true);
+
+                this.activeEnemies.push(enemy);
             }
         }
     }
 
-    preUpdate(time, delta) {
-        super.preUpdate(time, delta);
+    update(delta) {
         this.checkBounds();
+        this.updatePositions(delta);
         this.anchor.x += this.speed * this.direction * delta / 1000;
     }
 
+    updatePositions(delta) {
+        // Active Enemies
+        let newFrame = false;
+        this.countDown -= delta;
+        if (this.countDown < 0) {
+            this.countDown = TIME_PER_FRAME;
+            newFrame = true;
+        }
+        this.activeEnemies.forEach(enemy => {
+            if (newFrame) {
+                enemy.yPosIdx = Phaser.Math.Wrap(++enemy.yPosIdx, 0, Y_POSITIONS.length);
+            }
+            enemy.setY(enemy.offsetY + Y_POSITIONS[enemy.yPosIdx] + this.anchor.y);
+            enemy.setX(this.anchor.x + enemy.offsetX);
+        });
+    }
+
     checkBounds() {
-        const items = this.getMatching("active", true);
+        const items = this.activeEnemies;
         const freePath = items.every((enemy) => {
             if (enemy.x < GROUP_MARGIN + ITEM_WIDTH / 2) {
                 this.direction = DIRECTION.right;
@@ -112,9 +149,20 @@ export default class Enemies extends Phaser.Physics.Arcade.Group {
         }
     }
 
+    explode(enemy) {
+        this.fallingEnemies.push(enemy);
+        this.activeEnemies.splice(this.activeEnemies.indexOf(enemy), 1);
+        enemy.setDirectControl(false);
+        enemy.body.setGravityY(100);
+        enemy.body.setAngularVelocity(Phaser.Math.Between(-30, 30));
+        enemy.setBodySize(2, 2);
+        enemy.setCollideWorldBounds(true, 0, 0, true);
+        enemy.play("enemy_explode");
+    }
+
     shoot() {
 
-        const enemies = this.getMatching("active", true);
+        const enemies = this.activeEnemies;
 
         // Each element represents one column. 1 == free column, 0 == shooter selected
         const slots = [];
@@ -138,6 +186,12 @@ export default class Enemies extends Phaser.Physics.Arcade.Group {
         // Choose one front shooter 
         const shooter = Phaser.Math.RND.pick(shooters);
 
-        shooter.shoot();
+        shooter.chain(["enemy_shoot", "enemy_idle"]);
+        shooter.stop();
+        let b = this.bullets.getFirst();
+        if (b) {
+            this.snd_shoot.play();
+            b.shoot(shooter.x, shooter.y);
+        }
     }
 }
