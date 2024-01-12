@@ -115,8 +115,7 @@ export default class Enemies {
             return true;
         }, this);
 
-        if (!freePath) {
-            this.speed += SPEED_STEP;
+        if (!freePath) {            
             const tween = this.scene.tweens.addCounter({
                 from: this.anchor.y,
                 to: this.anchor.y + ITEM_PADDING,
@@ -137,6 +136,7 @@ export default class Enemies {
         enemy.setBodySize(2, 2);
         enemy.setCollideWorldBounds(true, 0, 0, true);
         enemy.play("enemy_explode");
+        this.speed += SPEED_STEP;
     }
 
     shoot() {
