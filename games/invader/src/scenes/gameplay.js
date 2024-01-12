@@ -28,6 +28,20 @@ export default class GamePlay extends Phaser.Scene {
 
         this.add.image(0, 0, "atlas", "Background-0").setOrigin(0).setTint(0x888888);
         this.add.image(0, this.scale.height, "atlas", "Ruins3-0").setOrigin(0, 1).setTint(0x666666);
+
+        // Player smoke effect
+        const smoke = this.add.particles(49, this.scale.height - 20, "atlas",
+            {
+                frame: "Smoke-0",
+                lifespan: 3000,
+                scale: { start: 0.5, end: 0 },
+                alpha: { max: 0.8, min: 0.3 },
+                speed: 6,
+                angle: { min: -160, max: -84 },
+                gravityY: -10,
+                emitting: false
+            });
+
         const player = this.add.existing(new Player(this, CENTER.x, this.scale.height - 20));
         this.enemies = new Enemies(this);
 
@@ -63,7 +77,7 @@ export default class GamePlay extends Phaser.Scene {
             gravityY: 4,
             emitting: false
         });
-        
+
         this.add.image(0, this.scale.height, "atlas", "Floor-0").setOrigin(0, 1);
 
         this.physics.world.on("worldbounds", (body, up, down) => {
@@ -71,6 +85,11 @@ export default class GamePlay extends Phaser.Scene {
                 body.enable = false;
                 this.sound.play("ground");
                 crash.emitParticle(10, body.x, body.y);
+                if (body.width == player.width) {
+                    smoke.x = player.x;
+                    smoke.y = player.y;
+                    smoke.emitting = true;
+                }
             }
         });
 
@@ -81,13 +100,13 @@ export default class GamePlay extends Phaser.Scene {
             this.enemies.explode(enemy);
         });
 
-        this.physics.add.collider(player, [this.enemies.bullets, this.enemies.activeEnemies], () => {            
+        this.physics.add.collider(player, [this.enemies.bullets, this.enemies.activeEnemies], () => {
             expl.emitParticle(60, player.x, player.y);
             player.explode();
         });
     }
 
-    update(time, delta) {        
+    update(time, delta) {
         this.enemies.update(delta);
     }
 }
