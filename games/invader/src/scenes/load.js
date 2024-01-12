@@ -20,6 +20,7 @@ export default class Load extends Phaser.Scene {
         this.load.audio("menu-background", "/assets/sounds/loop_space_ambience_128.mp3");
         this.load.audio("laser1", "/assets/sounds/laser1.ogg");
         this.load.audio("laser2", "/assets/sounds/laser2.ogg");
+        this.load.audio("explode", "/assets/sounds/expl_22050.ogg");
         this.load.audio("explode2", "/assets/sounds/expl2_22050.ogg");
 
         this.load.on("progress", this.updateText, this);

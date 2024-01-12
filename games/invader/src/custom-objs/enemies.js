@@ -55,15 +55,17 @@ export default class Enemies {
             emitting: false
         });
 
+        // Shoot sound
+        this.snd_shoot = scene.sound.add("laser2");
+        this.snd_ground = scene.sound.add("explode");
+
         this.scene.physics.world.on("worldbounds", (body, up, down) => {
             if (down) {
                 body.enable = false;
+                this.snd_ground.play();
                 this.expl.emitParticle(10, body.x, body.y);
             }
         });
-
-        // Shoot sound
-        this.snd_shoot = scene.sound.add("laser2");
 
         // Add enemies to the group
         const offsetX0 = - (ROW_SIZE * ITEM_WIDTH + (ROW_SIZE - 1) * ITEM_PADDING) / 2 + ITEM_WIDTH / 2;
