@@ -56,6 +56,25 @@ export default class GamePlay extends Phaser.Scene {
             rotate: { max: 359, min: 0 }
         });
 
+        // Crash effect on the ground
+        const crash = this.add.particles(0, 0, "atlas", {
+            frame: "Smoke-0",
+            lifespan: 1000,
+            speed: { min: 10, max: 20 },
+            scale: { max: 2, min: 0.5 },
+            alpha: { start: 1, end: 0 },
+            gravityY: 4,
+            emitting: false
+        });        
+
+        this.physics.world.on("worldbounds", (body, up, down) => {
+            if (down) {
+                body.enable = false;
+                this.sound.play("ground");
+                crash.emitParticle(10, body.x, body.y);
+            }
+        });
+
         this.physics.add.collider(player.bullet, this.enemies.activeEnemies, (bullet, enemy) => {
             bullet.reset();
             expl.emitParticle(40, enemy.x, enemy.y);

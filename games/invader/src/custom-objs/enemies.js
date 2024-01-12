@@ -44,25 +44,6 @@ export default class Enemies {
             this.bullets.add(new Bullet("Bullet-1", BULLET_SPEED, scene));
         }
 
-        // Explosion effect on the ground
-        this.expl = scene.add.particles(0, 0, "atlas", {
-            frame: "Smoke-0",
-            lifespan: 1000,
-            speed: { min: 10, max: 20 },
-            scale: { max: 2, min: 0.5 },
-            alpha: { start: 1, end: 0 },
-            gravityY: 4,
-            emitting: false
-        });        
-
-        this.scene.physics.world.on("worldbounds", (body, up, down) => {
-            if (down) {
-                body.enable = false;
-                this.scene.sound.play("ground");
-                this.expl.emitParticle(10, body.x, body.y);
-            }
-        });
-
         // Add enemies to the group
         const offsetX0 = - (ROW_SIZE * ITEM_WIDTH + (ROW_SIZE - 1) * ITEM_PADDING) / 2 + ITEM_WIDTH / 2;
         const offsetY0 = - (COLUMN_SIZE * ITEM_WIDTH + (COLUMN_SIZE - 1) * ITEM_PADDING) / 2 + GROUP_MARGIN + ITEM_WIDTH / 2;
