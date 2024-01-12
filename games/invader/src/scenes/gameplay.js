@@ -25,14 +25,11 @@ export default class GamePlay extends Phaser.Scene {
         this.sound.add("enemy_shoot");
         this.sound.add("ground");
         this.sound.add("explode");
-        
 
         this.add.image(0, 0, "atlas", "Background-0").setOrigin(0).setTint(0x888888);
         this.add.image(0, this.scale.height, "atlas", "Ruins3-0").setOrigin(0, 1).setTint(0x666666);
         const player = this.add.existing(new Player(this, CENTER.x, this.scale.height - 20));
-        this.enemies = new Enemies(this); //this.add.existing(new Enemies(this));
-        
-        console.log(this.enemies);
+        this.enemies = new Enemies(this);
 
         // One enemy shoot per second
         this.time.addEvent({
