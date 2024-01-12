@@ -31,7 +31,7 @@ export default class GamePlay extends Phaser.Scene {
         this.add.image(0, this.scale.height, "atlas", "Ruins3-0").setOrigin(0, 1).setTint(0x666666);
         const player = this.add.existing(new Player(this, CENTER.x, this.scale.height - 20));
         this.enemies = new Enemies(this); //this.add.existing(new Enemies(this));
-        this.add.image(0, this.scale.height, "atlas", "Floor-0").setOrigin(0, 1);
+        
         console.log(this.enemies);
 
         // One enemy shoot per second
@@ -65,7 +65,9 @@ export default class GamePlay extends Phaser.Scene {
             alpha: { start: 1, end: 0 },
             gravityY: 4,
             emitting: false
-        });        
+        });
+        
+        this.add.image(0, this.scale.height, "atlas", "Floor-0").setOrigin(0, 1);
 
         this.physics.world.on("worldbounds", (body, up, down) => {
             if (down) {
