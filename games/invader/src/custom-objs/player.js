@@ -45,4 +45,12 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this.setVelocityX(0);
     }
 
+    explode() {
+        this.setDirectControl(false);
+        this.body.setGravityY(100);
+        this.body.setAngularVelocity(Phaser.Math.Between(-30, 30));
+        this.setCollideWorldBounds(true, 0, 0, true);
+        this.play("player_hit");
+    }
+
 } // End class Player

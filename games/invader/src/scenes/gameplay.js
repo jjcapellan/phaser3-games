@@ -20,7 +20,7 @@ export default class GamePlay extends Phaser.Scene {
         this.anims.create({ key: "enemy_explode", frames: this.anims.generateFrameNames("atlas", { prefix: "Enemy-", start: 9, end: 14 }), frameRate: 5 });
         this.anims.create({ key: "player_idle", frames: this.anims.generateFrameNames("atlas", { prefix: "Player-", end: 5 }), repeat: -1 });
         this.anims.create({ key: "player_shoot", frames: this.anims.generateFrameNames("atlas", { prefix: "Player-", start: 6, end: 9 }) });
-        this.anims.create({ key: "player_hit", frames: this.anims.generateFrameNames("atlas", { prefix: "Player-", start: 10, end: 12 }), frameRate: 4 });
+        this.anims.create({ key: "player_hit", frames: this.anims.generateFrameNames("atlas", { prefix: "Player-", start: 10, end: 12 }), frameRate: 3 });
 
         this.add.image(0, 0, "atlas", "Background-0").setOrigin(0).setTint(0x888888);
         this.add.image(0, this.scale.height, "atlas", "Ruins3-0").setOrigin(0, 1).setTint(0x666666);
@@ -58,12 +58,13 @@ export default class GamePlay extends Phaser.Scene {
             this.enemies.explode(enemy);
         });
 
-        this.physics.add.collider(player, [this.enemies.bullets, this.enemies.activeEnemies], () => {
-            console.log("game over");
+        this.physics.add.collider(player, [this.enemies.bullets, this.enemies.activeEnemies], () => {            
+            expl.emitParticle(60, player.x, player.y);
+            player.explode();
         });
     }
 
-    update(time, delta) {
+    update(time, delta) {        
         this.enemies.update(delta);
     }
 }
