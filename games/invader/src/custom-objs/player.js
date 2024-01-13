@@ -1,5 +1,6 @@
 import Bullet from "./bullet.js";
 const PLAYER_SPEED = 120;
+const BULLET_SPEED = 250;
 
 export default class Player extends Phaser.Physics.Arcade.Sprite {
 
@@ -17,7 +18,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this.setCollideWorldBounds(true);
 
         // Bullet
-        this.bullet = scene.add.existing(new Bullet("Bullet-0", -200, scene));
+        this.bullet = scene.add.existing(new Bullet("Bullet-0", -BULLET_SPEED, scene));
 
         // Controls
         this.leftKey = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
