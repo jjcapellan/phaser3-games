@@ -8,12 +8,8 @@ export default class GamePlay extends Phaser.Scene {
     }
 
     create() {
-        this.anchor = {
-            x: CENTER.x,
-            y: CENTER.y
-        };
 
-        // Global animations
+        // Animations
         this.anims.create({ key: "enemy_idle", frames: this.anims.generateFrameNames("atlas", { prefix: "Enemy-", end: 4 }), repeat: -1 });
         this.anims.create({ key: "enemy_shoot", frames: this.anims.generateFrameNames("atlas", { prefix: "Enemy-", start: 5, end: 8 }) });
         this.anims.create({ key: "enemy_explode", frames: this.anims.generateFrameNames("atlas", { prefix: "Enemy-", start: 9, end: 14 }), frameRate: 5 });
@@ -21,17 +17,12 @@ export default class GamePlay extends Phaser.Scene {
         this.anims.create({ key: "player_shoot", frames: this.anims.generateFrameNames("atlas", { prefix: "Player-", start: 6, end: 9 }) });
         this.anims.create({ key: "player_hit", frames: this.anims.generateFrameNames("atlas", { prefix: "Player-", start: 10, end: 12 }), frameRate: 3 });
 
-        // Global sounds
-        this.sound.add("player_shoot");
-        this.sound.add("enemy_shoot");
-        this.sound.add("ground");
-        this.sound.add("explode");
 
         this.add.image(0, 0, "atlas", "Background-0").setOrigin(0).setTint(0x888888);
         this.add.image(0, this.scale.height, "atlas", "Ruins3-0").setOrigin(0, 1).setTint(0x666666);
 
         // Player smoke effect
-        const smoke = this.add.particles(49, this.scale.height - 20, "atlas",
+        this.prtSmoke = this.add.particles(49, this.scale.height - 20, "atlas",
             {
                 frame: "Smoke-0",
                 lifespan: 3000,
@@ -46,7 +37,7 @@ export default class GamePlay extends Phaser.Scene {
         this.player = this.add.existing(new Player(this, CENTER.x, this.scale.height - 20));
         this.enemies = new Enemies(this);
 
-        const shieldHit = this.add.particles(0, 0, "atlas", {
+        this.prtShieldHit = this.add.particles(0, 0, "atlas", {
             frame: "Particle-yellow",
             lifespan: 600,
             speed: { min: 10, max: 20 },
@@ -55,12 +46,10 @@ export default class GamePlay extends Phaser.Scene {
             gravityY: 4,
             emitting: false
         });
-        this.shields = new Shields(this, this.player.y - 40);
-
-
+        this.shields = new Shields(this, this.player.y - 40); console.log(this.player);
 
         // Explosion effect
-        const expl = this.add.particles(0, 0, "atlas", {
+        this.prtExplosion = this.add.particles(0, 0, "atlas", {
             frame: "Particle-yellow",
             lifespan: 2000,
             speed: { min: 20, max: 90 },
@@ -72,7 +61,7 @@ export default class GamePlay extends Phaser.Scene {
         });
 
         // Crash effect on the ground
-        const crash = this.add.particles(0, 0, "atlas", {
+        this.prtCrash = this.add.particles(0, 0, "atlas", {
             frame: "Smoke-0",
             lifespan: 1000,
             speed: { min: 10, max: 20 },
@@ -84,28 +73,34 @@ export default class GamePlay extends Phaser.Scene {
 
         this.add.image(0, this.scale.height, "atlas", "Floor-0").setOrigin(0, 1);
 
+        this.addColliders();
+
+        this.events.on("enemies-ready", this.onEnemiesReady, this);
+    }
+
+    addColliders() {
         this.physics.world.on("worldbounds", (body, up, down) => {
             if (down) {
                 body.enable = false;
                 this.sound.play("ground");
-                crash.emitParticle(10, body.x, body.y);
+                this.prtCrash.emitParticle(10, body.x, body.y);
                 if (body.width == this.player.width) {
-                    smoke.x = this.player.x;
-                    smoke.y = this.player.y;
-                    smoke.emitting = true;
+                    this.prtSmoke.x = this.player.x;
+                    this.prtSmoke.y = this.player.y;
+                    this.prtSmoke.emitting = true;
                 }
             }
         });
 
         this.physics.add.collider(this.player.bullet, this.enemies.activeEnemies, (bullet, enemy) => {
             bullet.reset();
-            expl.emitParticle(40, enemy.x, enemy.y);
+            this.prtExplosion.emitParticle(40, enemy.x, enemy.y);
             this.sound.play("explode");
             this.enemies.explode(enemy);
         });
 
         this.physics.add.collider(this.player, [this.enemies.bullets, this.enemies.activeEnemies], () => {
-            expl.emitParticle(60, this.player.x, this.player.y);
+            this.prtExplosion.emitParticle(60, this.player.x, this.player.y);
             this.player.explode();
             this.enemiesShootTimer.remove(false);
             this.enemies.regroup();
@@ -114,25 +109,22 @@ export default class GamePlay extends Phaser.Scene {
 
         this.physics.add.collider(this.shields.activeShields, this.enemies.bullets, (shield, bullet) => {
             bullet.reset();
-            shieldHit.setPosition(shield.x, shield.y - shield.height / 2);
-            shieldHit.particleAngle = { min: -135, max: -45 };
-            shieldHit.emitParticle(10);
+            this.prtShieldHit.setPosition(shield.x, shield.y - shield.height / 2);
+            this.prtShieldHit.particleAngle = { min: -135, max: -45 };
+            this.prtShieldHit.emitParticle(10);
             this.shields.hit(shield);
         });
 
         this.physics.add.collider(this.player.bullet, this.shields.activeShields, (bullet, shield) => {
             bullet.reset();
-            shieldHit.setPosition(shield.x, shield.y + shield.height / 2);
-            shieldHit.particleAngle = { min: 135, max: 45 };
-            shieldHit.emitParticle(10);
+            this.prtShieldHit.setPosition(shield.x, shield.y + shield.height / 2);
+            this.prtShieldHit.particleAngle = { min: 135, max: 45 };
+            this.prtShieldHit.emitParticle(10);
             this.shields.hit(shield);
         });
-
-        this.events.on("enemies-ready", this.onEnemiesReady, this);
     }
 
     onEnemiesReady() {
-        // One enemy shoot per second
         this.enemiesShootTimer = this.time.addEvent({
             delay: 1000,
             callback: () => {
