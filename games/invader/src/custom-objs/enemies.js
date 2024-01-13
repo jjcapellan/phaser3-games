@@ -127,6 +127,7 @@ export default class Enemies {
         enemy.setDirectControl(false);
         enemy.body.setGravityY(100);
         enemy.body.setAngularVelocity(Phaser.Math.Between(-30, 30));
+        enemy.body.setVelocityX(enemy.body.velocity.x / 4);
         enemy.setBodySize(2, 2);
         enemy.setCollideWorldBounds(true, 0, 0, true);
         enemy.play("enemy_explode");
