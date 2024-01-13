@@ -43,7 +43,7 @@ export default class GamePlay extends Phaser.Scene {
                 emitting: false
             });
 
-        const player = this.add.existing(new Player(this, CENTER.x, this.scale.height - 20));
+        this.player = this.add.existing(new Player(this, CENTER.x, this.scale.height - 20));
         this.enemies = new Enemies(this);
 
         const shieldHit = this.add.particles(0, 0, "atlas", {
@@ -55,17 +55,9 @@ export default class GamePlay extends Phaser.Scene {
             gravityY: 4,
             emitting: false
         });
-        this.shields = new Shields(this, player.y - 40);
+        this.shields = new Shields(this, this.player.y - 40);
 
-        // One enemy shoot per second
-        this.time.addEvent({
-            delay: 1000,
-            callback: () => {
-                this.enemies.shoot();
-            },
-            callbackScope: this,
-            loop: true
-        });
+
 
         // Explosion effect
         const expl = this.add.particles(0, 0, "atlas", {
@@ -97,24 +89,27 @@ export default class GamePlay extends Phaser.Scene {
                 body.enable = false;
                 this.sound.play("ground");
                 crash.emitParticle(10, body.x, body.y);
-                if (body.width == player.width) {
-                    smoke.x = player.x;
-                    smoke.y = player.y;
+                if (body.width == this.player.width) {
+                    smoke.x = this.player.x;
+                    smoke.y = this.player.y;
                     smoke.emitting = true;
                 }
             }
         });
 
-        this.physics.add.collider(player.bullet, this.enemies.activeEnemies, (bullet, enemy) => {
+        this.physics.add.collider(this.player.bullet, this.enemies.activeEnemies, (bullet, enemy) => {
             bullet.reset();
             expl.emitParticle(40, enemy.x, enemy.y);
             this.sound.play("explode");
             this.enemies.explode(enemy);
         });
 
-        this.physics.add.collider(player, [this.enemies.bullets, this.enemies.activeEnemies], () => {
-            expl.emitParticle(60, player.x, player.y);
-            player.explode();
+        this.physics.add.collider(this.player, [this.enemies.bullets, this.enemies.activeEnemies], () => {
+            expl.emitParticle(60, this.player.x, this.player.y);
+            this.player.explode();
+            this.enemiesShootTimer.remove(false);
+            this.enemies.regroup();
+
         });
 
         this.physics.add.collider(this.shields.activeShields, this.enemies.bullets, (shield, bullet) => {
@@ -125,12 +120,26 @@ export default class GamePlay extends Phaser.Scene {
             this.shields.hit(shield);
         });
 
-        this.physics.add.collider(player.bullet, this.shields.activeShields, (bullet, shield) => {
+        this.physics.add.collider(this.player.bullet, this.shields.activeShields, (bullet, shield) => {
             bullet.reset();
             shieldHit.setPosition(shield.x, shield.y + shield.height / 2);
             shieldHit.particleAngle = { min: 135, max: 45 };
             shieldHit.emitParticle(10);
             this.shields.hit(shield);
+        });
+
+        this.events.on("enemies-ready", this.onEnemiesReady, this);
+    }
+
+    onEnemiesReady() {
+        // One enemy shoot per second
+        this.enemiesShootTimer = this.time.addEvent({
+            delay: 1000,
+            callback: () => {
+                this.enemies.shoot();
+            },
+            callbackScope: this,
+            loop: true
         });
     }
 

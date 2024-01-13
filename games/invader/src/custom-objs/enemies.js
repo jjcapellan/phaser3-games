@@ -30,13 +30,14 @@ export default class Enemies {
         // Movement reference point.
         this.anchor = {
             x: scene.scale.width / 2,
-            y: (COLUMN_SIZE * ITEM_WIDTH + (COLUMN_SIZE - 1) * ITEM_PADDING) / 2 + GROUP_MARGIN
+            y: scene.scale.height / 2
         };
 
         this.countDown = TIME_PER_FRAME;
 
         this.speed = SPEED_INIT;
         this.direction = DIRECTION.right;
+        this.isAttacking = true;
 
         // Bullets pool
         this.bullets = scene.physics.add.group({ classType: Bullet });
@@ -44,44 +45,37 @@ export default class Enemies {
             this.bullets.add(new Bullet("Bullet-1", BULLET_SPEED, scene));
         }
 
-        // Add enemies to the group
-        const offsetX0 = - (ROW_SIZE * ITEM_WIDTH + (ROW_SIZE - 1) * ITEM_PADDING) / 2 + ITEM_WIDTH / 2;
-        const offsetY0 = - (COLUMN_SIZE * ITEM_WIDTH + (COLUMN_SIZE - 1) * ITEM_PADDING) / 2 + GROUP_MARGIN + ITEM_WIDTH / 2;
-        for (let i = 0; i < COLUMN_SIZE; i++) {
-            for (let j = 0; j < ROW_SIZE; j++) {
+        // Create enemies
+        for(let i = 0; i < ROW_SIZE * COLUMN_SIZE; i++){
+            let enemy = this.scene.physics.add.sprite(0, 0, "atlas", "Enemy-0");
 
-                let enemy = scene.physics.add.sprite(0, 0, "atlas", "Enemy-0");
+            // Offsets
+            enemy.offsetX = Phaser.Math.Between(-this.scene.scale.width, this.scene.scale.width);
+            enemy.offsetY = Phaser.Math.Between(-this.scene.scale.height * 3, -this.scene.scale.height);
 
-                // Offsets
-                enemy.offsetX = offsetX0 + j * (ITEM_PADDING + ITEM_WIDTH);
-                enemy.offsetY = offsetY0 + i * (ITEM_PADDING + ITEM_WIDTH);
+            // Initial Y_POSITIONS index
+            enemy.yPosIdx = Phaser.Math.Between(0, Y_POSITIONS.length - 1);
 
-                // Column position
-                enemy.column = j;
+            // Activate animation
+            enemy.play("enemy_idle");
 
-                // Initial Y_POSITIONS index
-                enemy.yPosIdx = Phaser.Math.Between(0, Y_POSITIONS.length - 1);
+            // Physics configured only to allow collisions
+            enemy.enableBody();
+            enemy.setDirectControl(true);
 
-                // Initial position
-                enemy.setX(enemy.offsetX + this.anchor.x);
-                enemy.setY(enemy.offsetY + Y_POSITIONS[enemy.yPosIdx] + this.anchor.y);
-
-                // Activate animation
-                enemy.play("enemy_idle");
-
-                // Physics configured only to allow collisions
-                enemy.enableBody();
-                enemy.setDirectControl(true);
-
-                this.activeEnemies.push(enemy);
-            }
+            this.activeEnemies.push(enemy);
         }
+
+        this.regroup(ROW_SIZE, COLUMN_SIZE);
+        
     }
 
     update(delta) {
-        this.checkBounds();
         this.updatePositions(delta);
-        this.anchor.x += this.speed * this.direction * delta / 1000;
+        if (this.isAttacking) {
+            this.checkBounds();
+            this.anchor.x += this.speed * this.direction * delta / 1000;
+        }
     }
 
     updatePositions(delta) {
@@ -115,7 +109,7 @@ export default class Enemies {
             return true;
         }, this);
 
-        if (!freePath) {            
+        if (!freePath) {
             const tween = this.scene.tweens.addCounter({
                 from: this.anchor.y,
                 to: this.anchor.y + ITEM_PADDING,
@@ -137,6 +131,58 @@ export default class Enemies {
         enemy.setCollideWorldBounds(true, 0, 0, true);
         enemy.play("enemy_explode");
         this.speed += SPEED_STEP;
+    }
+
+    regroup(rows, columns) {
+        let size = this.activeEnemies.length;
+        rows = rows || Math.floor(Math.sqrt(size));
+        columns = columns || Math.ceil(Math.sqrt(size));
+        columns = rows * columns < size ? columns + 1 : columns;
+        
+        this.isAttacking = false;
+
+        this.scene.tweens.add({
+            targets: this.anchor,
+            x: this.scene.scale.width / 2,
+            y: (columns * ITEM_WIDTH + (columns - 1) * ITEM_PADDING) / 2 + GROUP_MARGIN,
+            duration: 4000,
+            onComplete: () => {
+                if(this.scene.player.isAlive){                    
+                    this.isAttacking = true;
+                    this.scene.events.emit("enemies-ready");
+                }
+            }
+        });
+
+        const offsetX0 = - (rows * ITEM_WIDTH + (rows - 1) * ITEM_PADDING) / 2 + ITEM_WIDTH / 2;
+        const offsetY0 = - (columns * ITEM_WIDTH + (columns - 1) * ITEM_PADDING) / 2 + GROUP_MARGIN + ITEM_WIDTH / 2;
+        let idx = 0;
+
+        for (let i = 0; i < columns; i++) {
+            for (let j = 0; j < rows; j++) {
+                const newOffsetX = offsetX0 + j * (ITEM_PADDING + ITEM_WIDTH);
+                const newOffsetY = offsetY0 + i * (ITEM_PADDING + ITEM_WIDTH);
+
+                console.log(newOffsetY);
+
+                const enemy = this.activeEnemies[idx++];                              
+
+                if (!enemy) break;
+
+                // Column position
+                enemy.column = j;
+
+                this.scene.tweens.add({
+                    targets: enemy,
+                    offsetX: newOffsetX,
+                    offsetY: newOffsetY,
+                    duration: 3000,
+                    ease: "sine.inout"
+                });
+            }
+        }
+       
+
     }
 
     shoot() {
