@@ -12,9 +12,13 @@
       }, this);
       this.load.atlas("atlas", "/assets/imgs/invader.png", "/assets/imgs/invader.json");
       this.load.audio("menu-background", "/assets/sounds/loop_space_ambience_128.mp3");
-      this.load.audio("laser1", "/assets/sounds/laser1.ogg");
-      this.load.audio("laser2", "/assets/sounds/laser2.ogg");
-      this.load.audio("explode2", "/assets/sounds/expl2_22050.ogg");
+      this.load.audio("player_shoot", "/assets/sounds/laser1.ogg");
+      this.load.audio("enemy_shoot", "/assets/sounds/laser2.ogg");
+      this.load.audio("explode", "/assets/sounds/expl_22050.ogg");
+      this.load.audio("ground", "/assets/sounds/expl2_22050.ogg");
+      this.load.audio("shield_hit1", "/assets/sounds/metal_crash1_22050.ogg");
+      this.load.audio("shield_hit2", "/assets/sounds/metal_crash2_22050.ogg");
+      this.load.audio("shield_hit3", "/assets/sounds/metal_crash3_22050.ogg");
       this.load.on("progress", this.updateText, this);
     }
     // End preload()
@@ -470,24 +474,24 @@
   var Player = class extends Phaser.Physics.Arcade.Sprite {
     constructor(scene, x, y) {
       super(scene, x, y, "atlas", "Player-0");
-      this.anims.create({ key: "player_idle", frames: this.anims.generateFrameNames("atlas", { prefix: "Player-", end: 5 }), repeat: -1 });
-      this.anims.create({ key: "player_shoot", frames: this.anims.generateFrameNames("atlas", { prefix: "Player-", start: 6, end: 9 }) });
-      this.anims.create({ key: "player_hit", frames: this.anims.generateFrameNames("atlas", { prefix: "Player-", start: 10, end: 12 }), frameRate: 4 });
+      this.isAlive = true;
       this.play("player_idle");
       this.scene.physics.add.existing(this);
       this.enableBody();
+      this.setCollideWorldBounds(true);
       this.bullet = scene.add.existing(new Bullet("Bullet-0", -200, scene));
       this.leftKey = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
       this.rightKey = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
       this.shootKey = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
-      this.shootSound = this.scene.sound.add("laser1");
     }
     preUpdate(time, delta) {
       super.preUpdate(time, delta);
+      if (!this.isAlive)
+        return;
       if (Phaser.Input.Keyboard.JustDown(this.shootKey) && !this.bullet.active) {
         this.chain(["player_shoot", "player_idle"]);
         this.stop();
-        this.shootSound.play();
+        this.scene.sound.play("player_shoot");
         this.bullet.shoot(this.x, this.y);
       }
       if (this.leftKey.isDown) {
@@ -500,73 +504,21 @@
       }
       this.setVelocityX(0);
     }
-  };
-
-  // games/invader/src/custom-objs/enemy.js
-  var MOVE_RANGE = 14;
-  var FPS = 12;
-  var TIME_PER_FRAME = 1e3 / FPS;
-  var Y_POSITIONS = genOscPositions(MOVE_RANGE);
-  var Enemy = class extends Phaser.Physics.Arcade.Sprite {
-    constructor(scene, offsetX, offsetY, anchor, bullets) {
-      super(scene, 0, 0, "atlas", "Enemy-0");
-      this.scene = scene;
-      this.anchor = anchor;
-      this.offsetX = offsetX;
-      this.offsetY = offsetY;
-      this.countDown = TIME_PER_FRAME;
-      this.yPosIdx = Phaser.Math.Between(0, Y_POSITIONS.length - 1);
-      this.x = offsetX + anchor.x;
-      this.y = offsetY + Y_POSITIONS[this.yPosIdx] + anchor.y;
-      this.anims.create({ key: "enemy_idle", frames: this.anims.generateFrameNames("atlas", { prefix: "Enemy-", end: 4 }), repeat: -1 });
-      this.anims.create({ key: "enemy_shoot", frames: this.anims.generateFrameNames("atlas", { prefix: "Enemy-", start: 5, end: 8 }) });
-      this.anims.create({ key: "enemy_explode", frames: this.anims.generateFrameNames("atlas", { prefix: "Enemy-", start: 9, end: 14 }), frameRate: 5 });
-      this.play("enemy_idle");
-      this.scene.physics.add.existing(this);
-      this.enableBody();
-      this.setDirectControl();
-      this.bullets = bullets;
-    }
-    shoot() {
-      this.chain(["enemy_shoot", "enemy_idle"]);
-      this.stop();
-      let b = this.bullets.getFirst();
-      if (b) {
-        this.shootSound.play();
-        b.shoot(this.x, this.y);
-      }
-    }
     explode() {
-      this.parentGroup.remove(this);
       this.setDirectControl(false);
       this.body.setGravityY(100);
       this.body.setAngularVelocity(Phaser.Math.Between(-30, 30));
-      this.play("enemy_explode");
-    }
-    preUpdate(time, delta) {
-      super.preUpdate(time, delta);
-      if (this.body.gravity.y > 0) {
-        if (this.y > this.scene.scale.height - 4) {
-          this.body.setGravityY(0);
-          this.body.reset(this.x, this.y);
-          this.body.setEnable(false);
-          this.active = false;
-          this.emitter.emitParticle(10, this.x, this.y);
-        }
-        return;
-      }
-      ;
-      this.countDown -= delta;
-      if (this.countDown < 0) {
-        this.countDown = TIME_PER_FRAME;
-        this.yPosIdx = Phaser.Math.Wrap(++this.yPosIdx, 0, Y_POSITIONS.length);
-        this.setY(this.offsetY + Y_POSITIONS[this.yPosIdx] + this.anchor.y);
-      }
-      this.setX(this.anchor.x + this.offsetX);
+      this.setCollideWorldBounds(true, 0, 0, true);
+      this.play("player_hit");
+      this.isAlive = false;
     }
   };
 
   // games/invader/src/custom-objs/enemies.js
+  var MOVE_RANGE = 14;
+  var FPS = 12;
+  var TIME_PER_FRAME = 1e3 / FPS;
+  var Y_POSITIONS = genOscPositions(MOVE_RANGE);
   var ROW_SIZE = 11;
   var COLUMN_SIZE = 4;
   var ITEM_PADDING = 8;
@@ -580,55 +532,62 @@
     left: -1,
     right: 1
   };
-  var Enemies = class extends Phaser.Physics.Arcade.Group {
+  var Enemies = class {
     constructor(scene) {
-      super(scene.physics.world, scene);
+      this.activeEnemies = [];
+      this.fallingEnemies = [];
+      this.scene = scene;
       this.anchor = {
         x: scene.scale.width / 2,
         y: (COLUMN_SIZE * ITEM_WIDTH + (COLUMN_SIZE - 1) * ITEM_PADDING) / 2 + GROUP_MARGIN
       };
+      this.countDown = TIME_PER_FRAME;
       this.speed = SPEED_INIT;
       this.direction = DIRECTION.right;
       this.bullets = scene.physics.add.group({ classType: Bullet });
       for (let i = 0; i < BULLETS_POOL_SIZE; i++) {
         this.bullets.add(new Bullet("Bullet-1", BULLET_SPEED, scene));
       }
-      this.expl = scene.add.particles(0, 0, "atlas", {
-        frame: "Smoke-0",
-        lifespan: 1e3,
-        speed: { min: 10, max: 20 },
-        scale: { max: 2, min: 0.5 },
-        alpha: { start: 1, end: 0 },
-        gravityY: 4,
-        emitting: false
-      });
-      const snd_shoot = scene.sound.add("laser2");
       const offsetX0 = -(ROW_SIZE * ITEM_WIDTH + (ROW_SIZE - 1) * ITEM_PADDING) / 2 + ITEM_WIDTH / 2;
       const offsetY0 = -(COLUMN_SIZE * ITEM_WIDTH + (COLUMN_SIZE - 1) * ITEM_PADDING) / 2 + GROUP_MARGIN + ITEM_WIDTH / 2;
       for (let i = 0; i < COLUMN_SIZE; i++) {
         for (let j = 0; j < ROW_SIZE; j++) {
-          let enemy = new Enemy(
-            scene,
-            offsetX0 + j * (ITEM_PADDING + ITEM_WIDTH),
-            offsetY0 + i * (ITEM_PADDING + ITEM_WIDTH),
-            this.anchor,
-            this.bullets
-          );
+          let enemy = scene.physics.add.sprite(0, 0, "atlas", "Enemy-0");
+          enemy.offsetX = offsetX0 + j * (ITEM_PADDING + ITEM_WIDTH);
+          enemy.offsetY = offsetY0 + i * (ITEM_PADDING + ITEM_WIDTH);
           enemy.column = j;
-          enemy.parentGroup = this;
-          enemy.emitter = this.expl;
-          enemy.shootSound = snd_shoot;
-          this.add(enemy, true);
+          enemy.yPosIdx = Phaser.Math.Between(0, Y_POSITIONS.length - 1);
+          enemy.setX(enemy.offsetX + this.anchor.x);
+          enemy.setY(enemy.offsetY + Y_POSITIONS[enemy.yPosIdx] + this.anchor.y);
+          enemy.play("enemy_idle");
+          enemy.enableBody();
+          enemy.setDirectControl(true);
+          this.activeEnemies.push(enemy);
         }
       }
     }
-    preUpdate(time, delta) {
-      super.preUpdate(time, delta);
+    update(delta) {
       this.checkBounds();
+      this.updatePositions(delta);
       this.anchor.x += this.speed * this.direction * delta / 1e3;
     }
+    updatePositions(delta) {
+      let newFrame = false;
+      this.countDown -= delta;
+      if (this.countDown < 0) {
+        this.countDown = TIME_PER_FRAME;
+        newFrame = true;
+      }
+      this.activeEnemies.forEach((enemy) => {
+        if (newFrame) {
+          enemy.yPosIdx = Phaser.Math.Wrap(++enemy.yPosIdx, 0, Y_POSITIONS.length);
+        }
+        enemy.setY(enemy.offsetY + Y_POSITIONS[enemy.yPosIdx] + this.anchor.y);
+        enemy.setX(this.anchor.x + enemy.offsetX);
+      });
+    }
     checkBounds() {
-      const items = this.getMatching("active", true);
+      const items = this.activeEnemies;
       const freePath = items.every((enemy) => {
         if (enemy.x < GROUP_MARGIN + ITEM_WIDTH / 2) {
           this.direction = DIRECTION.right;
@@ -641,7 +600,6 @@
         return true;
       }, this);
       if (!freePath) {
-        this.speed += SPEED_STEP;
         const tween = this.scene.tweens.addCounter({
           from: this.anchor.y,
           to: this.anchor.y + ITEM_PADDING,
@@ -652,8 +610,19 @@
         });
       }
     }
+    explode(enemy) {
+      this.fallingEnemies.push(enemy);
+      this.activeEnemies.splice(this.activeEnemies.indexOf(enemy), 1);
+      enemy.setDirectControl(false);
+      enemy.body.setGravityY(100);
+      enemy.body.setAngularVelocity(Phaser.Math.Between(-30, 30));
+      enemy.setBodySize(2, 2);
+      enemy.setCollideWorldBounds(true, 0, 0, true);
+      enemy.play("enemy_explode");
+      this.speed += SPEED_STEP;
+    }
     shoot() {
-      const enemies = this.getMatching("active", true);
+      const enemies = this.activeEnemies;
       const slots = [];
       slots.length = ROW_SIZE;
       slots.fill(1);
@@ -670,7 +639,48 @@
         }
       }
       const shooter = Phaser.Math.RND.pick(shooters);
-      shooter.shoot();
+      shooter.chain(["enemy_shoot", "enemy_idle"]);
+      shooter.stop();
+      let b = this.bullets.getFirst();
+      if (b) {
+        this.scene.sound.play("enemy_shoot");
+        b.shoot(shooter.x, shooter.y);
+      }
+    }
+  };
+
+  // games/invader/src/custom-objs/shields.js
+  var FRAMES = ["Shield-2", "Shield-1", "Shield-0"];
+  var SND_HITS = ["shield_hit1", "shield_hit2", "shield_hit3"];
+  var GROUPS = 8;
+  var GROUP_SIZE = 4;
+  var Shields = class {
+    constructor(scene, y) {
+      this.activeShields = [];
+      this.scene = scene;
+      const SHIELD_WIDTH = scene.textures.getFrame("atlas", "Shield-0").width;
+      const GROUP_WIDTH = GROUP_SIZE * SHIELD_WIDTH;
+      const FREE_SPACE = scene.scale.width - GROUPS * GROUP_WIDTH;
+      const GROUP_PADDING = FREE_SPACE / (GROUPS + 1);
+      for (let i = 0; i < GROUPS; i++) {
+        let x = GROUP_PADDING + i * (GROUP_WIDTH + GROUP_PADDING);
+        for (let j = 0; j < GROUP_SIZE; j++) {
+          let shield = scene.physics.add.staticImage(x + j * SHIELD_WIDTH, y, "atlas", "Shield-0");
+          shield.energy = 2;
+          this.activeShields.push(shield);
+        }
+      }
+    }
+    hit(shield) {
+      this.scene.sound.play(SND_HITS[Phaser.Math.Between(0, 2)], { volume: 0.3 });
+      shield.energy--;
+      if (shield.energy < 0) {
+        this.activeShields.splice(this.activeShields.indexOf(shield), 1);
+        shield.setActive(false);
+        shield.setVisible(false);
+        return;
+      }
+      shield.setFrame(FRAMES[shield.energy]);
     }
   };
 
@@ -684,16 +694,49 @@
         x: CENTER.x,
         y: CENTER.y
       };
-      const explodeSound = this.sound.add("explode2");
+      this.anims.create({ key: "enemy_idle", frames: this.anims.generateFrameNames("atlas", { prefix: "Enemy-", end: 4 }), repeat: -1 });
+      this.anims.create({ key: "enemy_shoot", frames: this.anims.generateFrameNames("atlas", { prefix: "Enemy-", start: 5, end: 8 }) });
+      this.anims.create({ key: "enemy_explode", frames: this.anims.generateFrameNames("atlas", { prefix: "Enemy-", start: 9, end: 14 }), frameRate: 5 });
+      this.anims.create({ key: "player_idle", frames: this.anims.generateFrameNames("atlas", { prefix: "Player-", end: 5 }), repeat: -1 });
+      this.anims.create({ key: "player_shoot", frames: this.anims.generateFrameNames("atlas", { prefix: "Player-", start: 6, end: 9 }) });
+      this.anims.create({ key: "player_hit", frames: this.anims.generateFrameNames("atlas", { prefix: "Player-", start: 10, end: 12 }), frameRate: 3 });
+      this.sound.add("player_shoot");
+      this.sound.add("enemy_shoot");
+      this.sound.add("ground");
+      this.sound.add("explode");
       this.add.image(0, 0, "atlas", "Background-0").setOrigin(0).setTint(8947848);
       this.add.image(0, this.scale.height, "atlas", "Ruins3-0").setOrigin(0, 1).setTint(6710886);
+      const smoke = this.add.particles(
+        49,
+        this.scale.height - 20,
+        "atlas",
+        {
+          frame: "Smoke-0",
+          lifespan: 3e3,
+          scale: { start: 0.5, end: 0 },
+          alpha: { max: 0.8, min: 0.3 },
+          speed: 6,
+          angle: { min: -160, max: -84 },
+          gravityY: -10,
+          emitting: false
+        }
+      );
       const player = this.add.existing(new Player(this, CENTER.x, this.scale.height - 20));
-      const enemies = this.add.existing(new Enemies(this));
-      this.add.image(0, this.scale.height, "atlas", "Floor-0").setOrigin(0, 1);
+      this.enemies = new Enemies(this);
+      const shieldHit = this.add.particles(0, 0, "atlas", {
+        frame: "Particle-yellow",
+        lifespan: 600,
+        speed: { min: 10, max: 20 },
+        scale: { max: 1, min: 0.5 },
+        alpha: { start: 1, end: 0 },
+        gravityY: 4,
+        emitting: false
+      });
+      this.shields = new Shields(this, player.y - 40);
       this.time.addEvent({
         delay: 1e3,
         callback: () => {
-          enemies.shoot();
+          this.enemies.shoot();
         },
         callbackScope: this,
         loop: true
@@ -708,15 +751,55 @@
         emitting: false,
         rotate: { max: 359, min: 0 }
       });
-      this.physics.add.collider(player.bullet, enemies, (bullet, enemy) => {
+      const crash = this.add.particles(0, 0, "atlas", {
+        frame: "Smoke-0",
+        lifespan: 1e3,
+        speed: { min: 10, max: 20 },
+        scale: { max: 2, min: 0.5 },
+        alpha: { start: 1, end: 0 },
+        gravityY: 4,
+        emitting: false
+      });
+      this.add.image(0, this.scale.height, "atlas", "Floor-0").setOrigin(0, 1);
+      this.physics.world.on("worldbounds", (body, up, down) => {
+        if (down) {
+          body.enable = false;
+          this.sound.play("ground");
+          crash.emitParticle(10, body.x, body.y);
+          if (body.width == player.width) {
+            smoke.x = player.x;
+            smoke.y = player.y;
+            smoke.emitting = true;
+          }
+        }
+      });
+      this.physics.add.collider(player.bullet, this.enemies.activeEnemies, (bullet, enemy) => {
         bullet.reset();
         expl.emitParticle(40, enemy.x, enemy.y);
-        explodeSound.play();
-        enemy.explode();
+        this.sound.play("explode");
+        this.enemies.explode(enemy);
       });
-      this.physics.add.collider(player, [enemies.bullets, enemies], () => {
-        console.log("game over");
+      this.physics.add.collider(player, [this.enemies.bullets, this.enemies.activeEnemies], () => {
+        expl.emitParticle(60, player.x, player.y);
+        player.explode();
       });
+      this.physics.add.collider(this.shields.activeShields, this.enemies.bullets, (shield, bullet) => {
+        bullet.reset();
+        shieldHit.setPosition(shield.x, shield.y - shield.height / 2);
+        shieldHit.particleAngle = { min: -135, max: -45 };
+        shieldHit.emitParticle(10);
+        this.shields.hit(shield);
+      });
+      this.physics.add.collider(player.bullet, this.shields.activeShields, (bullet, shield) => {
+        bullet.reset();
+        shieldHit.setPosition(shield.x, shield.y + shield.height / 2);
+        shieldHit.particleAngle = { min: 135, max: 45 };
+        shieldHit.emitParticle(10);
+        this.shields.hit(shield);
+      });
+    }
+    update(time, delta) {
+      this.enemies.update(delta);
     }
   };
 
