@@ -1,5 +1,6 @@
 import Player from "../custom-objs/player.js";
 import Enemies from "../custom-objs/enemies.js";
+import Shields from "../custom-objs/shields.js";
 
 export default class GamePlay extends Phaser.Scene {
     constructor() {
@@ -44,6 +45,17 @@ export default class GamePlay extends Phaser.Scene {
 
         const player = this.add.existing(new Player(this, CENTER.x, this.scale.height - 20));
         this.enemies = new Enemies(this);
+
+        const shieldHit = this.add.particles(0, 0, "atlas", {
+            frame: "Particle-yellow",
+            lifespan: 600,
+            speed: { min: 10, max: 20 },
+            scale: { max: 1, min: 0.5 },
+            alpha: { start: 1, end: 0 },
+            gravityY: 4,
+            emitting: false
+        });
+        this.shields = new Shields(this, player.y - 40);
 
         // One enemy shoot per second
         this.time.addEvent({
@@ -103,6 +115,22 @@ export default class GamePlay extends Phaser.Scene {
         this.physics.add.collider(player, [this.enemies.bullets, this.enemies.activeEnemies], () => {
             expl.emitParticle(60, player.x, player.y);
             player.explode();
+        });
+
+        this.physics.add.collider(this.shields.activeShields, this.enemies.bullets, (shield, bullet) => {
+            bullet.reset();
+            shieldHit.setPosition(shield.x, shield.y - shield.height / 2);
+            shieldHit.particleAngle = { min: -135, max: -45 };
+            shieldHit.emitParticle(10);
+            this.shields.hit(shield);
+        });
+
+        this.physics.add.collider(player.bullet, this.shields.activeShields, (bullet, shield) => {
+            bullet.reset();
+            shieldHit.setPosition(shield.x, shield.y + shield.height / 2);
+            shieldHit.particleAngle = { min: 135, max: 45 };
+            shieldHit.emitParticle(10);
+            this.shields.hit(shield);
         });
     }
 
