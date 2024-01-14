@@ -9,6 +9,8 @@ export default class GamePlay extends Phaser.Scene {
 
     create() {
 
+        this.score = 0;
+
         // Animations
         this.anims.create({ key: "enemy_idle", frames: this.anims.generateFrameNames("atlas", { prefix: "Enemy-", end: 4 }), repeat: -1 });
         this.anims.create({ key: "enemy_shoot", frames: this.anims.generateFrameNames("atlas", { prefix: "Enemy-", start: 5, end: 8 }) });
@@ -73,6 +75,8 @@ export default class GamePlay extends Phaser.Scene {
 
         this.add.image(0, this.scale.height, "atlas", "Floor-0").setOrigin(0, 1);
 
+        this.addHud();
+
         this.addColliders();
 
         this.events.on("enemies-ready", this.onEnemiesReady, this);
@@ -97,6 +101,7 @@ export default class GamePlay extends Phaser.Scene {
             this.prtExplosion.emitParticle(40, enemy.x, enemy.y);
             this.sound.play("explode");
             this.enemies.explode(enemy);
+            this.updateScore(enemy.score);
         });
 
         this.physics.add.collider(this.player, [this.enemies.bullets, this.enemies.activeEnemies], () => {
@@ -122,6 +127,16 @@ export default class GamePlay extends Phaser.Scene {
             this.prtShieldHit.emitParticle(10);
             this.shields.hit(shield);
         });
+    }
+
+    addHud() {
+        this.add.bitmapText(4, 4, "pixelfont", "score");
+        this.txtScore = this.add.bitmapText(44, 4, "pixelfont", "0");
+    }
+
+    updateScore(points) {
+        this.score += points;
+        this.txtScore.setText(this.score);
     }
 
     onEnemiesReady() {

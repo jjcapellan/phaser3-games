@@ -46,7 +46,7 @@ export default class Enemies {
         }
 
         // Create enemies
-        for(let i = 0; i < ROW_SIZE * COLUMN_SIZE; i++){
+        for (let i = 0; i < ROW_SIZE * COLUMN_SIZE; i++) {
             let enemy = this.scene.physics.add.sprite(0, 0, "atlas", "Enemy-0");
 
             // Offsets
@@ -67,7 +67,7 @@ export default class Enemies {
         }
 
         this.regroup(ROW_SIZE, COLUMN_SIZE);
-        
+
     }
 
     update(delta) {
@@ -139,7 +139,7 @@ export default class Enemies {
         rows = rows || Math.floor(Math.sqrt(size));
         columns = columns || Math.ceil(Math.sqrt(size));
         columns = rows * columns < size ? columns + 1 : columns;
-        
+
         this.isAttacking = false;
 
         this.scene.tweens.add({
@@ -148,7 +148,7 @@ export default class Enemies {
             y: (columns * ITEM_WIDTH + (columns - 1) * ITEM_PADDING) / 2 + GROUP_MARGIN,
             duration: 4000,
             onComplete: () => {
-                if(this.scene.player.isAlive){                    
+                if (this.scene.player.isAlive) {
                     this.isAttacking = true;
                     this.scene.events.emit("enemies-ready");
                 }
@@ -158,20 +158,26 @@ export default class Enemies {
         const offsetX0 = - (rows * ITEM_WIDTH + (rows - 1) * ITEM_PADDING) / 2 + ITEM_WIDTH / 2;
         const offsetY0 = - (columns * ITEM_WIDTH + (columns - 1) * ITEM_PADDING) / 2 + GROUP_MARGIN + ITEM_WIDTH / 2;
         let idx = 0;
+        let score = 0;
+        const baseScore = 20;
 
         for (let i = 0; i < columns; i++) {
+            // First rows -> better score
+            score += (columns - i) * baseScore;
             for (let j = 0; j < rows; j++) {
                 const newOffsetX = offsetX0 + j * (ITEM_PADDING + ITEM_WIDTH);
                 const newOffsetY = offsetY0 + i * (ITEM_PADDING + ITEM_WIDTH);
 
                 console.log(newOffsetY);
 
-                const enemy = this.activeEnemies[idx++];                              
+                const enemy = this.activeEnemies[idx++];
 
                 if (!enemy) break;
 
                 // Column position
                 enemy.column = j;
+                // Score
+                enemy.score = score;
 
                 this.scene.tweens.add({
                     targets: enemy,
@@ -182,8 +188,6 @@ export default class Enemies {
                 });
             }
         }
-       
-
     }
 
     shoot() {
