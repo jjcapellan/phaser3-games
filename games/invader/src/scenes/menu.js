@@ -16,14 +16,6 @@ export default class Menu extends Phaser.Scene {
         this.add.image(0, 0, "atlas", "Background-0")
             .setOrigin(0);
 
-        // Enemy ships falling from sky
-        this.anims.create(
-            {
-                key: "enemy-falling",
-                frames: this.anims.generateFrameNames("atlas", { prefix: "Enemy_spin-", end: 3 }),
-                frameRate: 4,
-                repeat: -1
-            });
         this.ships = [];
         this.addShip(-50, -10, "Enemy_spin-0");
         this.addShip(-200, -300, "Enemy_spin-0");

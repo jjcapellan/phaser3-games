@@ -45,6 +45,18 @@ export default class Load extends Phaser.Scene {
 
     } // End createFont()
 
+    createAnimations() {
+        // Menu
+        this.anims.create({ key: "enemy-falling", frames: this.anims.generateFrameNames("atlas", { prefix: "Enemy_spin-", end: 3 }), frameRate: 4, repeat: -1 });
+        // Gameplay
+        this.anims.create({ key: "enemy_idle", frames: this.anims.generateFrameNames("atlas", { prefix: "Enemy-", end: 4 }), repeat: -1 });
+        this.anims.create({ key: "enemy_shoot", frames: this.anims.generateFrameNames("atlas", { prefix: "Enemy-", start: 5, end: 8 }) });
+        this.anims.create({ key: "enemy_explode", frames: this.anims.generateFrameNames("atlas", { prefix: "Enemy-", start: 9, end: 14 }), frameRate: 5 });
+        this.anims.create({ key: "player_idle", frames: this.anims.generateFrameNames("atlas", { prefix: "Player-", end: 5 }), repeat: -1 });
+        this.anims.create({ key: "player_shoot", frames: this.anims.generateFrameNames("atlas", { prefix: "Player-", start: 6, end: 9 }) });
+        this.anims.create({ key: "player_hit", frames: this.anims.generateFrameNames("atlas", { prefix: "Player-", start: 10, end: 12 }), frameRate: 3 });
+    }
+
     updateText(progress) {
 
         this.text_loading.text = `Loading ... ${Math.round(progress * 100)}%`;
