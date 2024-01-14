@@ -81,7 +81,7 @@ export default class GamePlay extends Phaser.Scene {
 
         this.cameraFX = this.cameras.main.postFX.addColorMatrix();
 
-        this.txtGameOver = this.add.bitmapText(CENTER.x, CENTER.y, "pixelfont", "game over")
+        this.txtGameOver = this.add.bitmapText(CENTER.x, CENTER.y - 40, "pixelfont", "game over")
             .setVisible(false)
             .setOrigin(0.5);
 
