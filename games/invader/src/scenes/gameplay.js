@@ -81,6 +81,13 @@ export default class GamePlay extends Phaser.Scene {
             .setOrigin(0.5);
 
         this.events.on("enemies-ready", this.onEnemiesReady, this);
+
+        this.events.once("shutdown", () => {
+            this.events.off("enemies-ready");
+            this.enemiesShootTimer.remove(false);
+            this.enemies = null;
+            this.player = null;
+        });
     }
 
     addColliders() {
