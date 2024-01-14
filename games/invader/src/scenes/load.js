@@ -13,6 +13,7 @@ export default class Load extends Phaser.Scene {
 
         this.load.on("complete", function () {
             this.createFont();
+            this.createAnimations();
             this.scene.start("menu");
         }, this);
 
