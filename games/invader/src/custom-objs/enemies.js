@@ -168,8 +168,6 @@ export default class Enemies {
                 const newOffsetX = offsetX0 + j * (ITEM_PADDING + ITEM_WIDTH);
                 const newOffsetY = offsetY0 + i * (ITEM_PADDING + ITEM_WIDTH);
 
-                console.log(newOffsetY);
-
                 const enemy = this.activeEnemies[idx++];
 
                 if (!enemy) break;

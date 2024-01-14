@@ -48,7 +48,7 @@ export default class GamePlay extends Phaser.Scene {
             gravityY: 4,
             emitting: false
         });
-        this.shields = new Shields(this, this.player.y - 40); console.log(this.player);
+        this.shields = new Shields(this, this.player.y - 40);
 
         // Explosion effect
         this.prtExplosion = this.add.particles(0, 0, "atlas", {
