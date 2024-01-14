@@ -1,5 +1,4 @@
 import LayerFactory from "phaser3-scrollinglayer";
-import { transition } from "../utils.js";
 
 export default class Menu extends Phaser.Scene {
     constructor() {
@@ -7,6 +6,8 @@ export default class Menu extends Phaser.Scene {
     }
 
     create() {
+        // Initial fadein effect
+        this.cameras.main.fadeIn(1000);
 
         // Background sound
         const snd_background = this.sound.add("menu-background", { loop: true });
@@ -75,10 +76,10 @@ export default class Menu extends Phaser.Scene {
             .setOrigin(0.5);
 
         // Mouse input
-        this.input.on("pointerdown", () => {
+        this.input.once("pointerdown", () => {
             snd_background.stop();
-            //this.scene.start("gameplay");
-            transition(this, "gameplay", 2000);
+            this.cameras.main.fadeOut(1000);
+            this.cameras.main.once("camerafadeoutcomplete", () => this.scene.start("gameplay"));
         });
     }
 

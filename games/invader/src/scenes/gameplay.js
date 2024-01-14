@@ -1,7 +1,6 @@
 import Player from "../custom-objs/player.js";
 import Enemies from "../custom-objs/enemies.js";
 import Shields from "../custom-objs/shields.js";
-import { transition } from "../utils.js";
 
 export default class GamePlay extends Phaser.Scene {
     constructor() {
@@ -9,6 +8,9 @@ export default class GamePlay extends Phaser.Scene {
     }
 
     create() {
+
+        // Initial fadein effect
+        this.cameras.main.fadeIn(1000);
 
         this.score = 0;
 
@@ -126,7 +128,10 @@ export default class GamePlay extends Phaser.Scene {
                 duration: 2000,
                 onComplete: () => {
                     this.txtClick.setVisible(true);
-                    this.input.on("pointerdown", /*() => transition(this, "menu", 2000)*/() => this.scene.start("menu"));
+                    this.input.once("pointerdown", () => {
+                        this.cameras.main.fadeOut(1000);
+                        this.cameras.main.once("camerafadeoutcomplete", () => this.scene.start("menu"));
+                    });
                 }
             });
         });

@@ -13,33 +13,3 @@ export function genOscPositions(range) {
     range = Math.floor(range / 2);
     return ANIM_POSITIONS_OSC.map(position => range * position);
 }
-
-/**
- * Simple transition between two scenes.
- * @param {PhaserScene} srcScene 
- * @param {string} targetKey 
- * @param {number} duration 
- */
-export function transition(srcScene, targetKey, duration) {
-    srcScene.scene.launch(targetKey);
-    const target = srcScene.scene.get(targetKey);
-    target.cameras.main.alpha = 0;
-
-    srcScene.tweens.chain({
-        tweens: [
-            {
-                targets: srcScene.cameras.main,
-                alpha: 0,
-                duration: duration/2
-            },
-            {
-                targets: target.cameras.main,
-                alpha: 1,
-                duration: duration/2,
-                onComplete: () => {
-                    srcScene.scene.stop();
-                }
-            }
-        ]
-    });        
-}
