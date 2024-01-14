@@ -1,6 +1,7 @@
 import Player from "../custom-objs/player.js";
 import Enemies from "../custom-objs/enemies.js";
 import Shields from "../custom-objs/shields.js";
+import { transition } from "../utils.js";
 
 export default class GamePlay extends Phaser.Scene {
     constructor() {
@@ -84,6 +85,9 @@ export default class GamePlay extends Phaser.Scene {
         this.txtGameOver = this.add.bitmapText(CENTER.x, CENTER.y - 40, "pixelfont", "game over")
             .setVisible(false)
             .setOrigin(0.5);
+        this.txtClick = this.add.bitmapText(CENTER.x, CENTER.y + 20, "pixelfont", "click to return")
+            .setVisible(false)
+            .setOrigin(0.5);
 
         this.events.on("enemies-ready", this.onEnemiesReady, this);
     }
@@ -121,7 +125,11 @@ export default class GamePlay extends Phaser.Scene {
             this.tweens.add({
                 targets: this.txtGameOver,
                 scale: 8,
-                duration: 2000
+                duration: 2000,
+                onComplete: () => {
+                    this.txtClick.setVisible(true);
+                    this.input.on("pointerdown", /*() => transition(this, "menu", 2000)*/() => this.scene.start("menu"));
+                }
             });
         });
 
