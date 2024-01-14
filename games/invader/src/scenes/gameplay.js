@@ -79,6 +79,12 @@ export default class GamePlay extends Phaser.Scene {
 
         this.addColliders();
 
+        this.cameraFX = this.cameras.main.postFX.addColorMatrix();
+
+        this.txtGameOver = this.add.bitmapText(CENTER.x, CENTER.y, "pixelfont", "game over")
+            .setVisible(false)
+            .setOrigin(0.5);
+
         this.events.on("enemies-ready", this.onEnemiesReady, this);
     }
 
@@ -109,7 +115,14 @@ export default class GamePlay extends Phaser.Scene {
             this.player.explode();
             this.enemiesShootTimer.remove(false);
             this.enemies.regroup();
-
+            this.cameraFX.desaturateLuminance();
+            this.sound.play("explode", { rate: 0.5 });
+            this.txtGameOver.setVisible(true);
+            this.tweens.add({
+                targets: this.txtGameOver,
+                scale: 8,
+                duration: 2000
+            });
         });
 
         this.physics.add.collider(this.shields.activeShields, this.enemies.bullets, (shield, bullet) => {
