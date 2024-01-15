@@ -114,7 +114,7 @@ export default class GamePlay extends Phaser.Scene {
             this.updateScore(enemy.score);
         });
 
-        this.physics.add.collider(this.player, [this.enemies.bullets, this.enemies.activeEnemies], () => {
+        this.physics.add.collider(this.player, [this.enemies.bullets, ...this.enemies.activeEnemies], () => {
             this.prtExplosion.emitParticle(60, this.player.x, this.player.y);
             this.player.explode();
             this.enemiesShootTimer.remove(false);
