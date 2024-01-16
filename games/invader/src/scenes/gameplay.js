@@ -2,94 +2,90 @@ import Player from "../custom-objs/player.js";
 import Enemies from "../custom-objs/enemies.js";
 import Shields from "../custom-objs/shields.js";
 
+const PRT_CONFIG_SHIELD = {
+    frame: "Particle-yellow",
+    lifespan: 600,
+    speed: { min: 10, max: 20 },
+    scale: { max: 1, min: 0.5 },
+    alpha: { start: 1, end: 0 },
+    gravityY: 4,
+    emitting: false
+};
+
+const PRT_CONFIG_SMOKE = {
+    frame: "Smoke-0",
+    lifespan: 3000,
+    scale: { start: 0.5, end: 0 },
+    alpha: { max: 0.8, min: 0.3 },
+    speed: 6,
+    angle: { min: -160, max: -84 },
+    gravityY: -10,
+    emitting: false
+};
+
+const PRT_CONFIG_EXPLOSION = {
+    frame: "Particle-yellow",
+    lifespan: 2000,
+    speed: { min: 20, max: 90 },
+    scale: { max: 2, min: 0.5 },
+    alpha: { start: 1, end: 0 },
+    blendMode: "add",
+    emitting: false,
+    rotate: { max: 359, min: 0 }
+};
+
+const PRT_CONFIG_CRASH = {
+    frame: "Smoke-0",
+    lifespan: 1000,
+    speed: { min: 10, max: 20 },
+    scale: { max: 2, min: 0.5 },
+    alpha: { start: 1, end: 0 },
+    gravityY: 4,
+    emitting: false
+};
+
 export default class GamePlay extends Phaser.Scene {
     constructor() {
         super("gameplay");
+    };
+
+    init() {
+        this.score = 0;
     }
 
     create() {
 
-        // Initial fadein effect
+        // Initial camera fadein effect
         this.cameras.main.fadeIn(1000);
-
-        this.score = 0;
-
+        // Background image layer
         this.add.image(0, 0, "atlas", "Background-0").setOrigin(0).setTint(0x888888);
+        // Second image layer
         this.add.image(0, this.scale.height, "atlas", "Ruins3-0").setOrigin(0, 1).setTint(0x666666);
-
-        // Player smoke effect
-        this.prtSmoke = this.add.particles(49, this.scale.height - 20, "atlas",
-            {
-                frame: "Smoke-0",
-                lifespan: 3000,
-                scale: { start: 0.5, end: 0 },
-                alpha: { max: 0.8, min: 0.3 },
-                speed: 6,
-                angle: { min: -160, max: -84 },
-                gravityY: -10,
-                emitting: false
-            });
-
+        // Player smoke effect after hit
+        this.prtSmoke = this.add.particles(49, this.scale.height - 20, "atlas", PRT_CONFIG_SMOKE);
+        // Player ship
         this.player = this.add.existing(new Player(this, CENTER.x, this.scale.height - 20));
+        // Group of enemies
         this.enemies = new Enemies(this);
-
-        this.prtShieldHit = this.add.particles(0, 0, "atlas", {
-            frame: "Particle-yellow",
-            lifespan: 600,
-            speed: { min: 10, max: 20 },
-            scale: { max: 1, min: 0.5 },
-            alpha: { start: 1, end: 0 },
-            gravityY: 4,
-            emitting: false
-        });
+        // Shield hit effect
+        this.prtShieldHit = this.add.particles(0, 0, "atlas", PRT_CONFIG_SHIELD);
+        // Groups of shields
         this.shields = new Shields(this, this.player.y - 40);
-
         // Explosion effect
-        this.prtExplosion = this.add.particles(0, 0, "atlas", {
-            frame: "Particle-yellow",
-            lifespan: 2000,
-            speed: { min: 20, max: 90 },
-            scale: { max: 2, min: 0.5 },
-            alpha: { start: 1, end: 0 },
-            blendMode: "add",
-            emitting: false,
-            rotate: { max: 359, min: 0 }
-        });
-
+        this.prtExplosion = this.add.particles(0, 0, "atlas", PRT_CONFIG_EXPLOSION);
         // Crash effect on the ground
-        this.prtCrash = this.add.particles(0, 0, "atlas", {
-            frame: "Smoke-0",
-            lifespan: 1000,
-            speed: { min: 10, max: 20 },
-            scale: { max: 2, min: 0.5 },
-            alpha: { start: 1, end: 0 },
-            gravityY: 4,
-            emitting: false
-        });
-
+        this.prtCrash = this.add.particles(0, 0, "atlas", PRT_CONFIG_CRASH);
+        // Front image layer
         this.add.image(0, this.scale.height, "atlas", "Floor-0").setOrigin(0, 1);
-
-        this.addHud();
-
+        // Colliders
         this.addColliders();
-
+        // Camera effect used in game over
         this.cameraFX = this.cameras.main.postFX.addColorMatrix();
+        // Text labels
+        this.addTextLabels();
+        // Events
+        this.addEvents();
 
-        this.txtGameOver = this.add.bitmapText(CENTER.x, CENTER.y - 40, "pixelfont", "game over")
-            .setVisible(false)
-            .setOrigin(0.5);
-        this.txtClick = this.add.bitmapText(CENTER.x, CENTER.y + 20, "pixelfont", "click to return")
-            .setVisible(false)
-            .setOrigin(0.5);
-
-        this.events.on("enemies-ready", this.onEnemiesReady, this);
-
-        this.events.once("shutdown", () => {
-            this.events.off("enemies-ready");
-            this.enemiesShootTimer.remove(false);
-            this.enemies = null;
-            this.player = null;
-        });
     }
 
     addColliders() {
@@ -153,9 +149,29 @@ export default class GamePlay extends Phaser.Scene {
         });
     }
 
-    addHud() {
-        this.add.bitmapText(4, 4, "pixelfont", "score");
-        this.txtScore = this.add.bitmapText(44, 4, "pixelfont", "0");
+    addEvents() {
+        this.events.on("enemies-ready", this.onEnemiesReady, this);
+        this.events.once("shutdown", () => {
+            this.events.off("enemies-ready");
+            this.enemiesShootTimer.remove(false);
+            this.enemies = null;
+            this.player = null;
+        });
+    }
+
+    addTextLabels() {
+        this.add.bitmapText(4, 4, "pixelfont", "score")
+            .setDepth(100);
+        this.txtScore = this.add.bitmapText(44, 4, "pixelfont", "0")
+            .setDepth(100);
+        this.txtGameOver = this.add.bitmapText(CENTER.x, CENTER.y - 40, "pixelfont", "game over")
+            .setVisible(false)
+            .setOrigin(0.5)
+            .setDepth(100);
+        this.txtClick = this.add.bitmapText(CENTER.x, CENTER.y + 20, "pixelfont", "click to return")
+            .setVisible(false)
+            .setOrigin(0.5)
+            .setDepth(100);
     }
 
     updateScore(points) {
