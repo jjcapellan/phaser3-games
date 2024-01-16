@@ -100,6 +100,7 @@ export default class GamePlay extends Phaser.Scene {
                     this.prtSmoke.y = this.player.y;
                     this.prtSmoke.emitting = true;
                 }
+                this.cameras.main.shake(100, 0.01);
             }
         });
 
@@ -125,7 +126,7 @@ export default class GamePlay extends Phaser.Scene {
                 duration: 2000,
                 onComplete: () => {
                     this.sound.play("gameover");
-                    this.txtClick.setVisible(true);                    
+                    this.txtClick.setVisible(true);
                     this.input.once("pointerdown", () => {
                         this.sound.stopAll();
                         this.cameras.main.fadeOut(1000);
