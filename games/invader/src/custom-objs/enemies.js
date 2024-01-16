@@ -1,5 +1,5 @@
 import Bullet from "./bullet.js";
-import { genOscPositions } from "../utils.js";
+import { genOscPositions, SOUND_LEVELS } from "../utils.js";
 
 const MOVE_RANGE = 14;
 const FPS = 12;
@@ -218,7 +218,7 @@ export default class Enemies {
         shooter.stop();
         let b = this.bullets.getFirst();
         if (b) {
-            this.scene.sound.play("enemy_shoot");
+            this.scene.sound.play("enemy_shoot", { volume: SOUND_LEVELS.shoot });
             b.shoot(shooter.x, shooter.y);
         }
     }

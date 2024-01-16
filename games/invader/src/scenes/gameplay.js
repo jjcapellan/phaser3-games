@@ -1,6 +1,7 @@
 import Player from "../custom-objs/player.js";
 import Enemies from "../custom-objs/enemies.js";
 import Shields from "../custom-objs/shields.js";
+import { SOUND_LEVELS } from "../utils.js";
 
 const PRT_CONFIG_SHIELD = {
     frame: "Particle-yellow",
@@ -92,7 +93,7 @@ export default class GamePlay extends Phaser.Scene {
         this.physics.world.on("worldbounds", (body, up, down) => {
             if (down) {
                 body.enable = false;
-                this.sound.play("ground");
+                this.sound.play("ground", { volume: SOUND_LEVELS.crash });
                 this.prtCrash.emitParticle(10, body.x, body.y);
                 if (body.width == this.player.width) {
                     this.prtSmoke.x = this.player.x;
@@ -105,7 +106,7 @@ export default class GamePlay extends Phaser.Scene {
         this.physics.add.collider(this.player.bullet, this.enemies.activeEnemies, (bullet, enemy) => {
             bullet.reset();
             this.prtExplosion.emitParticle(40, enemy.x, enemy.y);
-            this.sound.play("explode");
+            this.sound.play("explode", { volume: SOUND_LEVELS.explode });
             this.enemies.explode(enemy);
             this.updateScore(enemy.score);
         });
@@ -116,7 +117,7 @@ export default class GamePlay extends Phaser.Scene {
             this.enemiesShootTimer.remove(false);
             this.enemies.regroup();
             this.cameraFX.desaturateLuminance();
-            this.sound.play("explode", { rate: 0.5 });
+            this.sound.play("explode", { volume: SOUND_LEVELS.explode, rate: 0.5 });
             this.txtGameOver.setVisible(true);
             this.tweens.add({
                 targets: this.txtGameOver,

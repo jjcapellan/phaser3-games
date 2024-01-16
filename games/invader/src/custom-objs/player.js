@@ -1,4 +1,5 @@
 import Bullet from "./bullet.js";
+import { SOUND_LEVELS } from "../utils.js";
 const PLAYER_SPEED = 120;
 const BULLET_SPEED = 250;
 
@@ -28,11 +29,11 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
     preUpdate(time, delta) {
         super.preUpdate(time, delta);
-        if(!this.isAlive) return;
+        if (!this.isAlive) return;
         if (Phaser.Input.Keyboard.JustDown(this.shootKey) && !this.bullet.active) {
             this.chain(["player_shoot", "player_idle"]);
             this.stop();
-            this.scene.sound.play("player_shoot");
+            this.scene.sound.play("player_shoot", { volume: SOUND_LEVELS.shoot });
             this.bullet.shoot(this.x, this.y);
         }
         if (this.leftKey.isDown) {

@@ -1,3 +1,10 @@
+export const SOUND_LEVELS = {
+    explode: 0.9,
+    shoot: 0.2,
+    crash: 0.6,
+    metal: 0.2
+};
+
 // Represents an oscillating pattern. Used to animate images or sprites positions
 const ANIM_POSITIONS_OSC = [
     -1, -0.9, -0.7, -0.4, 0, 0.4, 0.7, 0.9, 1, 0.9, 0.7, 0.4, 0, -0.4, -0.7, -0.9
