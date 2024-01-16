@@ -124,8 +124,10 @@ export default class GamePlay extends Phaser.Scene {
                 scale: 8,
                 duration: 2000,
                 onComplete: () => {
-                    this.txtClick.setVisible(true);
+                    this.sound.play("gameover");
+                    this.txtClick.setVisible(true);                    
                     this.input.once("pointerdown", () => {
+                        this.sound.stopAll();
                         this.cameras.main.fadeOut(1000);
                         this.cameras.main.once("camerafadeoutcomplete", () => this.scene.start("menu"));
                     });
