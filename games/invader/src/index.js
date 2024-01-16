@@ -8,9 +8,9 @@ if (IS_DEV) {
 }
 
 const COLORS = window.COLORS = {
-    background: "#f4f4f4",
+    background: "#0a0c0c",
     foreground: "#1a1c2c"
-}
+};
 
 function runGame() {
     let config = {
@@ -31,9 +31,9 @@ function runGame() {
     };
 
     window.CENTER = {
-        x: config.width/2,
-        y: config.height/2
-    }
+        x: config.width / 2,
+        y: config.height / 2
+    };
 
     new Phaser.Game(config);
 }
