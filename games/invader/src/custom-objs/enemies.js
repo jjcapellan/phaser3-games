@@ -158,12 +158,8 @@ export default class Enemies {
         const offsetX0 = - (rows * ITEM_WIDTH + (rows - 1) * ITEM_PADDING) / 2 + ITEM_WIDTH / 2;
         const offsetY0 = - (columns * ITEM_WIDTH + (columns - 1) * ITEM_PADDING) / 2 + GROUP_MARGIN + ITEM_WIDTH / 2;
         let idx = 0;
-        let score = 0;
-        const baseScore = 20;
 
         for (let i = 0; i < columns; i++) {
-            // First rows -> better score
-            score += (columns - i) * baseScore;
             for (let j = 0; j < rows; j++) {
                 const newOffsetX = offsetX0 + j * (ITEM_PADDING + ITEM_WIDTH);
                 const newOffsetY = offsetY0 + i * (ITEM_PADDING + ITEM_WIDTH);
@@ -174,8 +170,6 @@ export default class Enemies {
 
                 // Column position
                 enemy.column = j;
-                // Score
-                enemy.score = score;
 
                 this.scene.tweens.add({
                     targets: enemy,

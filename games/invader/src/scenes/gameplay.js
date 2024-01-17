@@ -45,6 +45,8 @@ const PRT_CONFIG_CRASH = {
     emitting: false
 };
 
+const HIT_SCORE = 100;
+
 export default class GamePlay extends Phaser.Scene {
     constructor() {
         super("gameplay");
@@ -118,7 +120,7 @@ export default class GamePlay extends Phaser.Scene {
             this.prtExplosion.emitParticle(40, enemy.x, enemy.y);
             this.sound.play("explode", { volume: SOUND_LEVELS.explode });
             this.enemies.explode(enemy);
-            this.updateScore(enemy.score);
+            this.updateScore(HIT_SCORE);
             this.hits++;
         });
 
