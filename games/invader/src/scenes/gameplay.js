@@ -54,12 +54,19 @@ export default class GamePlay extends Phaser.Scene {
         this.score = 0;
         this.totalShoots = 0;
         this.hits = 0;
+        this.best = 0;
     }
 
     create() {
-
         // Initial camera fadein effect
         this.cameras.main.fadeIn(1000);
+        // Initialize persistent high score
+        const best = window.localStorage.getItem("best");
+        if (best == null) {
+            window.localStorage.setItem("best", "0");
+        } else {
+            this.best = best;
+        }
         // Background image layer
         this.add.image(0, 0, "atlas", "Background-0").setOrigin(0).setTint(0x888888);
         // Second image layer
@@ -123,11 +130,17 @@ export default class GamePlay extends Phaser.Scene {
             this.cameraFX.desaturateLuminance();
             this.sound.play("explode", { volume: SOUND_LEVELS.explode, rate: 0.5 });
             this.txtGameOver.setVisible(true);
-            
+
             // Score
-            const accuracy = this.totalShoots/this.hits;
+            const accuracy = this.totalShoots / this.hits;
             const bonus = Math.round(accuracy * this.score);
             this.score += bonus;
+
+            if (this.score > this.best) {
+                this.best = this.score;
+                window.localStorage.setItem("best", this.score);
+                this.txtBest.setText(this.best);
+            }
 
             this.tweens.add({
                 targets: this.txtGameOver,
@@ -174,9 +187,17 @@ export default class GamePlay extends Phaser.Scene {
     }
 
     addTextLabels() {
-        this.add.bitmapText(4, 4, "pixelfont", "score")
+        this.add.bitmapText(20, 8, "pixelfont", "score")
+            .setOrigin(0.5)
             .setDepth(100);
-        this.txtScore = this.add.bitmapText(44, 4, "pixelfont", "0")
+        this.txtScore = this.add.bitmapText(20, 16 + 1, "pixelfont", "0")
+            .setOrigin(0.5)
+            .setDepth(100);
+        this.add.bitmapText(this.scale.width - 40, 8, "pixelfont", "high score")
+            .setOrigin(0.5)
+            .setDepth(100);
+        this.txtBest = this.add.bitmapText(this.scale.width - 40, 16 + 1, "pixelfont", this.best)
+            .setOrigin(0.5)
             .setDepth(100);
         this.txtGameOver = this.add.bitmapText(CENTER.x, CENTER.y - 40, "pixelfont", "game over")
             .setVisible(false)
