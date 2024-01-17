@@ -38,7 +38,7 @@ export default class Load extends Phaser.Scene {
             image: "atlas",
             width: 7,
             height: 10,
-            chars: "0123456789abcdefghijklmnopqrstuvwxyz?!.,+-* ",
+            chars: "0123456789abcdefghijklmnopqrstuvwxyz?!.,+-*% ",
             charsPerRow: 10,
             offset: { x: 0, y: 831 },
             spacing: { x: 1, y: 1 }
