@@ -52,6 +52,8 @@ export default class GamePlay extends Phaser.Scene {
 
     init() {
         this.score = 0;
+        this.totalShoots = 0;
+        this.hits = 0;
     }
 
     create() {
@@ -110,6 +112,7 @@ export default class GamePlay extends Phaser.Scene {
             this.sound.play("explode", { volume: SOUND_LEVELS.explode });
             this.enemies.explode(enemy);
             this.updateScore(enemy.score);
+            this.hits++;
         });
 
         this.physics.add.collider(this.player, [this.enemies.bullets, ...this.enemies.activeEnemies], () => {
@@ -120,6 +123,12 @@ export default class GamePlay extends Phaser.Scene {
             this.cameraFX.desaturateLuminance();
             this.sound.play("explode", { volume: SOUND_LEVELS.explode, rate: 0.5 });
             this.txtGameOver.setVisible(true);
+            
+            // Score
+            const accuracy = this.totalShoots/this.hits;
+            const bonus = Math.round(accuracy * this.score);
+            this.score += bonus;
+
             this.tweens.add({
                 targets: this.txtGameOver,
                 scale: 8,
@@ -155,6 +164,7 @@ export default class GamePlay extends Phaser.Scene {
 
     addEvents() {
         this.events.on("enemies-ready", this.onEnemiesReady, this);
+        this.events.on("player-shoot", () => this.totalShoots++);
         this.events.once("shutdown", () => {
             this.events.off("enemies-ready");
             this.enemiesShootTimer.remove(false);

@@ -35,6 +35,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
             this.stop();
             this.scene.sound.play("player_shoot", { volume: SOUND_LEVELS.shoot });
             this.bullet.shoot(this.x, this.y);
+            this.scene.events.emit("player-shoot");
         }
         if (this.leftKey.isDown) {
             this.setVelocityX(-PLAYER_SPEED);
