@@ -115,7 +115,7 @@ export default class GamePlay extends Phaser.Scene {
             }
         });
 
-        this.physics.add.collider(this.player.bullet, this.enemies.activeEnemies, (bullet, enemy) => {
+        const bulletCollider = this.physics.add.collider(this.player.bullet, this.enemies.activeEnemies, (bullet, enemy) => {
             bullet.reset();
             this.prtExplosion.emitParticle(40, enemy.x, enemy.y);
             this.sound.play("explode", { volume: SOUND_LEVELS.explode });
@@ -127,6 +127,7 @@ export default class GamePlay extends Phaser.Scene {
         this.physics.add.collider(this.player, [this.enemies.bullets, ...this.enemies.activeEnemies], () => {
             this.prtExplosion.emitParticle(60, this.player.x, this.player.y);
             this.player.explode();
+            bulletCollider.active = false;
             this.enemiesShootTimer.remove(false);
             this.enemies.regroup();
             this.cameraFX.desaturateLuminance();
