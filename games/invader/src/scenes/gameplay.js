@@ -124,6 +124,9 @@ export default class GamePlay extends Phaser.Scene {
             this.hits++;
             this.accuracy = Math.round((this.hits / this.totalShoots) * 100) / 100;
             this.updateScore(Math.round(HIT_SCORE * this.accuracy));
+            if (!this.enemies.activeEnemies.length) {
+                this.gameWin();
+            }
         });
 
         this.physics.add.collider(this.player, [this.enemies.bullets, ...this.enemies.activeEnemies], () => {
@@ -188,6 +191,14 @@ export default class GamePlay extends Phaser.Scene {
             .setDepth(100);
     }
 
+    checkBestScore() {
+        if (this.score > this.best) {
+            this.best = this.score;
+            window.localStorage.setItem("best", this.score);
+            this.txtBest.setText(this.best);
+        }
+    }
+
     gameOver() {
         this.enemiesShootTimer.remove(false);
         this.enemies.regroup();
@@ -195,18 +206,30 @@ export default class GamePlay extends Phaser.Scene {
         this.sound.play("explode", { volume: SOUND_LEVELS.explode, rate: 0.5 });
         this.txtGameOver.setVisible(true);
 
-        if (this.score > this.best) {
-            this.best = this.score;
-            window.localStorage.setItem("best", this.score);
-            this.txtBest.setText(this.best);
-        }
+        this.checkBestScore();
 
+        this.showGameOver("gameover");
+
+    }
+
+    gameWin() {
+        this.cameraFX.desaturateLuminance();
+        this.txtGameOver.setText("victory")
+            .setVisible(true);
+
+        this.checkBestScore();
+
+        this.showGameOver("gamewin");
+
+    }
+
+    showGameOver(sound) {
         this.tweens.add({
             targets: this.txtGameOver,
             scale: 8,
             duration: 2000,
             onComplete: () => {
-                this.sound.play("gameover");
+                this.sound.play(sound);
                 this.txtNewScore.setVisible(true)
                     .setText("score " + this.score + " pts");
                 this.txtClick.setVisible(true);
