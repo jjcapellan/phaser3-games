@@ -23,7 +23,9 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
         // Controls
         this.leftKey = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
+        this.leftKey2 = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
         this.rightKey = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
+        this.rightKey2 = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
         this.shootKey = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
     }
 
@@ -37,11 +39,11 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
             this.bullet.shoot(this.x, this.y);
             this.scene.events.emit("player-shoot");
         }
-        if (this.leftKey.isDown) {
+        if (this.leftKey.isDown || this.leftKey2.isDown) {
             this.setVelocityX(-PLAYER_SPEED);
             return;
         }
-        if (this.rightKey.isDown) {
+        if (this.rightKey.isDown || this.rightKey2.isDown) {
             this.setVelocityX(PLAYER_SPEED);
             return;
         }
