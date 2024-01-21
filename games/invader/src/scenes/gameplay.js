@@ -151,7 +151,7 @@ export default class GamePlay extends Phaser.Scene {
     }
 
     addEvents() {
-        this.events.on("enemies-ready", this.onEnemiesReady, this);
+        this.events.once("enemies-ready", this.onEnemiesReady, this);
         this.events.on("player-shoot", () => this.totalShoots++);
         this.events.once("shutdown", () => {
             this.events.off("enemies-ready");
