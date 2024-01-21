@@ -162,6 +162,7 @@ export default class GamePlay extends Phaser.Scene {
         this.events.on("player-shoot", () => this.totalShoots++);
         this.events.once("shutdown", () => {
             this.events.off("enemies-ready");
+            this.events.off("player-shoot");
             this.enemiesShootTimer.remove(false);
             this.enemies = null;
             this.player = null;
@@ -261,7 +262,6 @@ export default class GamePlay extends Phaser.Scene {
         this.accuracy = Math.round((this.hits / this.totalShoots) * 100) / 100;
         const txt = this.accuracy * 100;
         this.txtAccuracy.setText(txt + "%");
-        console.log(this.hits, this.totalShoots);
     }
 
     onEnemiesReady() {
