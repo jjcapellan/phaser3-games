@@ -130,35 +130,7 @@ export default class GamePlay extends Phaser.Scene {
             this.prtExplosion.emitParticle(60, this.player.x, this.player.y);
             this.player.explode();
             bulletCollider.active = false;
-            this.enemiesShootTimer.remove(false);
-            this.enemies.regroup();
-            this.cameraFX.desaturateLuminance();
-            this.sound.play("explode", { volume: SOUND_LEVELS.explode, rate: 0.5 });
-            this.txtGameOver.setVisible(true);
-
-
-            if (this.score > this.best) {
-                this.best = this.score;
-                window.localStorage.setItem("best", this.score);
-                this.txtBest.setText(this.best);
-            }
-
-            this.tweens.add({
-                targets: this.txtGameOver,
-                scale: 8,
-                duration: 2000,
-                onComplete: () => {
-                    this.sound.play("gameover");
-                    this.txtNewScore.setVisible(true)
-                        .setText("score " + this.score + " pts");
-                    this.txtClick.setVisible(true);
-                    this.input.once("pointerdown", () => {
-                        this.sound.stopAll();
-                        this.cameras.main.fadeOut(1000);
-                        this.cameras.main.once("camerafadeoutcomplete", () => this.scene.start("menu"));
-                    });
-                }
-            });
+            this.gameOver();
         });
 
         this.physics.add.collider(this.shields.activeShields, this.enemies.bullets, (shield, bullet) => {
@@ -214,6 +186,37 @@ export default class GamePlay extends Phaser.Scene {
             .setVisible(false)
             .setOrigin(0.5)
             .setDepth(100);
+    }
+
+    gameOver() {
+        this.enemiesShootTimer.remove(false);
+        this.enemies.regroup();
+        this.cameraFX.desaturateLuminance();
+        this.sound.play("explode", { volume: SOUND_LEVELS.explode, rate: 0.5 });
+        this.txtGameOver.setVisible(true);
+
+        if (this.score > this.best) {
+            this.best = this.score;
+            window.localStorage.setItem("best", this.score);
+            this.txtBest.setText(this.best);
+        }
+
+        this.tweens.add({
+            targets: this.txtGameOver,
+            scale: 8,
+            duration: 2000,
+            onComplete: () => {
+                this.sound.play("gameover");
+                this.txtNewScore.setVisible(true)
+                    .setText("score " + this.score + " pts");
+                this.txtClick.setVisible(true);
+                this.input.once("pointerdown", () => {
+                    this.sound.stopAll();
+                    this.cameras.main.fadeOut(1000);
+                    this.cameras.main.once("camerafadeoutcomplete", () => this.scene.start("menu"));
+                });
+            }
+        });
     }
 
     updateScore(points) {
