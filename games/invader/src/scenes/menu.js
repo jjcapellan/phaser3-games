@@ -5,13 +5,17 @@ export default class Menu extends Phaser.Scene {
         super("menu");
     }
 
+    init() {
+        this.closing = false;
+    }
+
     create() {
         // Initial fadein effect
         this.cameras.main.fadeIn(1000);
 
         // Background sound
-        const snd_background = this.sound.add("menu-background", { loop: true });
-        snd_background.play();
+        this.snd_background = this.sound.add("menu-background", { loop: true });
+        this.snd_background.play();
 
         // Background image (sky and sun)
         this.add.image(0, 0, "atlas", "Background-0")
@@ -72,15 +76,21 @@ export default class Menu extends Phaser.Scene {
             .setTint(0x1a1c2c)
             .setOrigin(0.5);
 
-        this.add.bitmapText(CENTER.x, CENTER.y / 3 + 40 * 2, "pixelfont", "click to play")
+        this.add.bitmapText(CENTER.x, CENTER.y / 3 + 40 * 2, "pixelfont", "press any key to play")
             .setOrigin(0.5);
 
-        // Mouse input
-        this.input.once("pointerdown", () => {
-            snd_background.stop();
-            this.cameras.main.fadeOut(1000);
-            this.cameras.main.once("camerafadeoutcomplete", () => this.scene.start("gameplay"));
+        // Keyboard input
+        this.input.keyboard.once("keydown", () => {
+            this.changeScene();
         });
+    }
+
+    changeScene() {
+        if (this.closing) return;
+        this.closing = true;
+        this.snd_background.stop();
+        this.cameras.main.fadeOut(1000);
+        this.cameras.main.once("camerafadeoutcomplete", () => this.scene.start("gameplay"));
     }
 
     addShip(x, y, texture) {

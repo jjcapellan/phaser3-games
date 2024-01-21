@@ -196,7 +196,7 @@ export default class GamePlay extends Phaser.Scene {
             .setVisible(false)
             .setOrigin(0.5)
             .setScale(2);
-        this.txtClick = this.add.bitmapText(CENTER.x, CENTER.y + 40, "pixelfont", "click to return")
+        this.txtClick = this.add.bitmapText(CENTER.x, CENTER.y + 40, "pixelfont", "press any key to return")
             .setVisible(false)
             .setOrigin(0.5)
             .setDepth(100);
@@ -208,6 +208,12 @@ export default class GamePlay extends Phaser.Scene {
             window.localStorage.setItem("best", this.score);
             this.txtBest.setText(this.best);
         }
+    }
+
+    changeScene() {
+        this.sound.stopAll();
+        this.cameras.main.fadeOut(1000);
+        this.cameras.main.once("camerafadeoutcomplete", () => this.scene.start("menu"));
     }
 
     gameOver() {
@@ -244,11 +250,7 @@ export default class GamePlay extends Phaser.Scene {
                 this.txtNewScore.setVisible(true)
                     .setText("score " + this.score + " pts");
                 this.txtClick.setVisible(true);
-                this.input.once("pointerdown", () => {
-                    this.sound.stopAll();
-                    this.cameras.main.fadeOut(1000);
-                    this.cameras.main.once("camerafadeoutcomplete", () => this.scene.start("menu"));
-                });
+                this.input.keyboard.once("keydown", () => this.changeScene());
             }
         });
     }
