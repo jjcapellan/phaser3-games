@@ -18,6 +18,11 @@ export default class Bullet extends Phaser.Physics.Arcade.Image {
     }
 
     preUpdate(time, delta) {
+        if (this.y < 0) {
+            this.scene.updateAccuracy();
+            this.reset();
+            return;
+        }
         if (this.y > this.scene.scale.height || this.y < 0) {
             this.reset();
         }

@@ -123,7 +123,7 @@ export default class GamePlay extends Phaser.Scene {
             this.sound.play("explode", { volume: SOUND_LEVELS.explode, pan: getPan(enemy.x, this.scale.width) });
             this.enemies.explode(enemy);
             this.hits++;
-            this.accuracy = Math.round((this.hits / this.totalShoots) * 100) / 100;
+            this.updateAccuracy();
             this.updateScore(Math.round(HIT_SCORE * this.accuracy));
             if (!this.enemies.activeEnemies.length) {
                 this.gameWin();
@@ -153,6 +153,7 @@ export default class GamePlay extends Phaser.Scene {
             this.prtShieldHit.emitParticle(10);
             this.sound.play(SND_HITS[Phaser.Math.Between(0, 2)], { volume: SOUND_LEVELS.metal, pan: getPan(shield.x, this.scale.width) });
             this.shields.hit(shield);
+            this.updateAccuracy();
         });
     }
 
@@ -172,6 +173,12 @@ export default class GamePlay extends Phaser.Scene {
             .setOrigin(0.5)
             .setDepth(100);
         this.txtScore = this.add.bitmapText(20, 16 + 1, "pixelfont", "0")
+            .setOrigin(0.5)
+            .setDepth(100);
+        this.add.bitmapText(80, 8, "pixelfont", "accuracy")
+            .setOrigin(0.5)
+            .setDepth(100);
+        this.txtAccuracy = this.add.bitmapText(80, 16 + 1, "pixelfont", "100%")
             .setOrigin(0.5)
             .setDepth(100);
         this.add.bitmapText(this.scale.width - 40, 8, "pixelfont", "high score")
@@ -248,6 +255,13 @@ export default class GamePlay extends Phaser.Scene {
     updateScore(points) {
         this.score += points;
         this.txtScore.setText(this.score);
+    }
+
+    updateAccuracy() {
+        this.accuracy = Math.round((this.hits / this.totalShoots) * 100) / 100;
+        const txt = this.accuracy * 100;
+        this.txtAccuracy.setText(txt + "%");
+        console.log(this.hits, this.totalShoots);
     }
 
     onEnemiesReady() {
