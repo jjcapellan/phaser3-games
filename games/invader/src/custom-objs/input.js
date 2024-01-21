@@ -12,14 +12,18 @@ export default class Controls {
         this.rightKey2 = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
         this.fireKey = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
 
+        // Checks gamepad
         if (this.scene.input.gamepad.total > 0) {
             this.pad = this.scene.input.gamepad.getPad(0);
             this.padButtontPrevState = 0;
+        } else {
+            scene.input.gamepad.once('connected', pad => {
+                this.pad = pad;
+            });
         }
 
         scene.events.on("update", () => this.update());
         scene.events.once("shutdown", () => scene.events.off("update"));
-        
     }
 
     update() {
@@ -56,5 +60,4 @@ export default class Controls {
     reset() {
         this.left = this.right = this.fire = 0;
     }
-
 }
