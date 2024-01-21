@@ -208,6 +208,8 @@ export default class Enemies {
         // Choose one front shooter 
         const shooter = Phaser.Math.RND.pick(shooters);
 
+        if(!shooter) return;
+        
         shooter.chain(["enemy_shoot", "enemy_idle"]);
         shooter.stop();
         let b = this.bullets.getFirst();
