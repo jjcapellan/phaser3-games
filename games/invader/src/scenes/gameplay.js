@@ -45,7 +45,7 @@ const PRT_CONFIG_CRASH = {
     emitting: false
 };
 
-const HIT_SCORE = 100;
+const HIT_SCORE = 200;
 
 export default class GamePlay extends Phaser.Scene {
     constructor() {
@@ -57,6 +57,7 @@ export default class GamePlay extends Phaser.Scene {
         this.totalShoots = 0;
         this.hits = 0;
         this.best = 0;
+        this.accuracy = 0;
     }
 
     create() {
@@ -120,8 +121,9 @@ export default class GamePlay extends Phaser.Scene {
             this.prtExplosion.emitParticle(40, enemy.x, enemy.y);
             this.sound.play("explode", { volume: SOUND_LEVELS.explode });
             this.enemies.explode(enemy);
-            this.updateScore(HIT_SCORE);
             this.hits++;
+            this.accuracy = Math.round((this.hits / this.totalShoots) * 100) / 100;
+            this.updateScore(Math.round(HIT_SCORE * this.accuracy));
         });
 
         this.physics.add.collider(this.player, [this.enemies.bullets, ...this.enemies.activeEnemies], () => {
@@ -133,11 +135,6 @@ export default class GamePlay extends Phaser.Scene {
             this.cameraFX.desaturateLuminance();
             this.sound.play("explode", { volume: SOUND_LEVELS.explode, rate: 0.5 });
             this.txtGameOver.setVisible(true);
-
-            // Score
-            const accuracy = this.totalShoots / this.hits;
-            const bonus = Math.round(accuracy * this.score);
-            this.score += bonus;
 
             if (this.score > this.best) {
                 this.best = this.score;
