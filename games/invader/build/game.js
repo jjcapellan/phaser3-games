@@ -16,10 +16,11 @@
       this.load.audio("player_shoot", "/assets/sounds/laser1.ogg");
       this.load.audio("enemy_shoot", "/assets/sounds/laser2.ogg");
       this.load.audio("explode", "/assets/sounds/expl_22050.ogg");
-      this.load.audio("ground", "/assets/sounds/expl2_22050.ogg");
+      this.load.audio("ground", "/assets/sounds/ground.ogg");
       this.load.audio("shield_hit1", "/assets/sounds/metal_crash1_22050.ogg");
       this.load.audio("shield_hit2", "/assets/sounds/metal_crash2_22050.ogg");
       this.load.audio("shield_hit3", "/assets/sounds/metal_crash3_22050.ogg");
+      this.load.audio("gameover", "/assets/sounds/gameover1.ogg");
       this.load.on("progress", this.updateText, this);
     }
     // End preload()
@@ -28,7 +29,7 @@
         image: "atlas",
         width: 7,
         height: 10,
-        chars: "0123456789abcdefghijklmnopqrstuvwxyz?!.,+-* ",
+        chars: "0123456789abcdefghijklmnopqrstuvwxyz?!.,+-*%:= ",
         charsPerRow: 10,
         offset: { x: 0, y: 831 },
         spacing: { x: 1, y: 1 }
@@ -427,6 +428,36 @@
     }
   };
 
+  // games/invader/src/utils.js
+  var SOUND_LEVELS = {
+    explode: 0.9,
+    shoot: 0.2,
+    crash: 0.6,
+    metal: 0.2
+  };
+  var ANIM_POSITIONS_OSC = [
+    -1,
+    -0.9,
+    -0.7,
+    -0.4,
+    0,
+    0.4,
+    0.7,
+    0.9,
+    1,
+    0.9,
+    0.7,
+    0.4,
+    0,
+    -0.4,
+    -0.7,
+    -0.9
+  ];
+  function genOscPositions(range) {
+    range = Math.floor(range / 2);
+    return ANIM_POSITIONS_OSC.map((position) => range * position);
+  }
+
   // games/invader/src/custom-objs/player.js
   var PLAYER_SPEED = 120;
   var BULLET_SPEED = 250;
@@ -450,8 +481,9 @@
       if (Phaser.Input.Keyboard.JustDown(this.shootKey) && !this.bullet.active) {
         this.chain(["player_shoot", "player_idle"]);
         this.stop();
-        this.scene.sound.play("player_shoot");
+        this.scene.sound.play("player_shoot", { volume: SOUND_LEVELS.shoot });
         this.bullet.shoot(this.x, this.y);
+        this.scene.events.emit("player-shoot");
       }
       if (this.leftKey.isDown) {
         this.setVelocityX(-PLAYER_SPEED);
@@ -472,30 +504,6 @@
       this.isAlive = false;
     }
   };
-
-  // games/invader/src/utils.js
-  var ANIM_POSITIONS_OSC = [
-    -1,
-    -0.9,
-    -0.7,
-    -0.4,
-    0,
-    0.4,
-    0.7,
-    0.9,
-    1,
-    0.9,
-    0.7,
-    0.4,
-    0,
-    -0.4,
-    -0.7,
-    -0.9
-  ];
-  function genOscPositions(range) {
-    range = Math.floor(range / 2);
-    return ANIM_POSITIONS_OSC.map((position) => range * position);
-  }
 
   // games/invader/src/custom-objs/enemies.js
   var MOVE_RANGE = 14;
@@ -623,10 +631,7 @@
       const offsetX0 = -(rows * ITEM_WIDTH + (rows - 1) * ITEM_PADDING) / 2 + ITEM_WIDTH / 2;
       const offsetY0 = -(columns * ITEM_WIDTH + (columns - 1) * ITEM_PADDING) / 2 + GROUP_MARGIN + ITEM_WIDTH / 2;
       let idx = 0;
-      let score = 0;
-      const baseScore = 20;
       for (let i = 0; i < columns; i++) {
-        score += (columns - i) * baseScore;
         for (let j = 0; j < rows; j++) {
           const newOffsetX = offsetX0 + j * (ITEM_PADDING + ITEM_WIDTH);
           const newOffsetY = offsetY0 + i * (ITEM_PADDING + ITEM_WIDTH);
@@ -634,7 +639,6 @@
           if (!enemy)
             break;
           enemy.column = j;
-          enemy.score = score;
           this.scene.tweens.add({
             targets: enemy,
             offsetX: newOffsetX,
@@ -667,7 +671,7 @@
       shooter.stop();
       let b = this.bullets.getFirst();
       if (b) {
-        this.scene.sound.play("enemy_shoot");
+        this.scene.sound.play("enemy_shoot", { volume: SOUND_LEVELS.shoot });
         b.shoot(shooter.x, shooter.y);
       }
     }
@@ -696,7 +700,7 @@
       }
     }
     hit(shield) {
-      this.scene.sound.play(SND_HITS[Phaser.Math.Between(0, 2)], { volume: 0.3 });
+      this.scene.sound.play(SND_HITS[Phaser.Math.Between(0, 2)], { volume: SOUND_LEVELS.metal });
       shield.energy--;
       if (shield.energy < 0) {
         this.activeShields.splice(this.activeShields.indexOf(shield), 1);
@@ -709,110 +713,125 @@
   };
 
   // games/invader/src/scenes/gameplay.js
+  var PRT_CONFIG_SHIELD = {
+    frame: "Particle-yellow",
+    lifespan: 600,
+    speed: { min: 10, max: 20 },
+    scale: { max: 1, min: 0.5 },
+    alpha: { start: 1, end: 0 },
+    gravityY: 4,
+    emitting: false
+  };
+  var PRT_CONFIG_SMOKE = {
+    frame: "Smoke-0",
+    lifespan: 3e3,
+    scale: { start: 0.5, end: 0 },
+    alpha: { max: 0.8, min: 0.3 },
+    speed: 6,
+    angle: { min: -160, max: -84 },
+    gravityY: -10,
+    emitting: false
+  };
+  var PRT_CONFIG_EXPLOSION = {
+    frame: "Particle-yellow",
+    lifespan: 2e3,
+    speed: { min: 20, max: 90 },
+    scale: { max: 2, min: 0.5 },
+    alpha: { start: 1, end: 0 },
+    blendMode: "add",
+    emitting: false,
+    rotate: { max: 359, min: 0 }
+  };
+  var PRT_CONFIG_CRASH = {
+    frame: "Smoke-0",
+    lifespan: 1e3,
+    speed: { min: 10, max: 20 },
+    scale: { max: 2, min: 0.5 },
+    alpha: { start: 1, end: 0 },
+    gravityY: 4,
+    emitting: false
+  };
+  var HIT_SCORE = 200;
   var GamePlay = class extends Phaser.Scene {
     constructor() {
       super("gameplay");
     }
+    init() {
+      this.score = 0;
+      this.totalShoots = 0;
+      this.hits = 0;
+      this.best = 0;
+      this.accuracy = 0;
+    }
     create() {
       this.cameras.main.fadeIn(1e3);
-      this.score = 0;
+      const best = window.localStorage.getItem("best");
+      if (best == null) {
+        window.localStorage.setItem("best", "0");
+      } else {
+        this.best = best;
+      }
       this.add.image(0, 0, "atlas", "Background-0").setOrigin(0).setTint(8947848);
       this.add.image(0, this.scale.height, "atlas", "Ruins3-0").setOrigin(0, 1).setTint(6710886);
-      this.prtSmoke = this.add.particles(
-        49,
-        this.scale.height - 20,
-        "atlas",
-        {
-          frame: "Smoke-0",
-          lifespan: 3e3,
-          scale: { start: 0.5, end: 0 },
-          alpha: { max: 0.8, min: 0.3 },
-          speed: 6,
-          angle: { min: -160, max: -84 },
-          gravityY: -10,
-          emitting: false
-        }
-      );
+      this.prtSmoke = this.add.particles(49, this.scale.height - 20, "atlas", PRT_CONFIG_SMOKE);
       this.player = this.add.existing(new Player(this, CENTER.x, this.scale.height - 20));
       this.enemies = new Enemies(this);
-      this.prtShieldHit = this.add.particles(0, 0, "atlas", {
-        frame: "Particle-yellow",
-        lifespan: 600,
-        speed: { min: 10, max: 20 },
-        scale: { max: 1, min: 0.5 },
-        alpha: { start: 1, end: 0 },
-        gravityY: 4,
-        emitting: false
-      });
+      this.prtShieldHit = this.add.particles(0, 0, "atlas", PRT_CONFIG_SHIELD);
       this.shields = new Shields(this, this.player.y - 40);
-      this.prtExplosion = this.add.particles(0, 0, "atlas", {
-        frame: "Particle-yellow",
-        lifespan: 2e3,
-        speed: { min: 20, max: 90 },
-        scale: { max: 2, min: 0.5 },
-        alpha: { start: 1, end: 0 },
-        blendMode: "add",
-        emitting: false,
-        rotate: { max: 359, min: 0 }
-      });
-      this.prtCrash = this.add.particles(0, 0, "atlas", {
-        frame: "Smoke-0",
-        lifespan: 1e3,
-        speed: { min: 10, max: 20 },
-        scale: { max: 2, min: 0.5 },
-        alpha: { start: 1, end: 0 },
-        gravityY: 4,
-        emitting: false
-      });
+      this.prtExplosion = this.add.particles(0, 0, "atlas", PRT_CONFIG_EXPLOSION);
+      this.prtCrash = this.add.particles(0, 0, "atlas", PRT_CONFIG_CRASH);
       this.add.image(0, this.scale.height, "atlas", "Floor-0").setOrigin(0, 1);
-      this.addHud();
       this.addColliders();
       this.cameraFX = this.cameras.main.postFX.addColorMatrix();
-      this.txtGameOver = this.add.bitmapText(CENTER.x, CENTER.y - 40, "pixelfont", "game over").setVisible(false).setOrigin(0.5);
-      this.txtClick = this.add.bitmapText(CENTER.x, CENTER.y + 20, "pixelfont", "click to return").setVisible(false).setOrigin(0.5);
-      this.events.on("enemies-ready", this.onEnemiesReady, this);
-      this.events.once("shutdown", () => {
-        this.events.off("enemies-ready");
-        this.enemiesShootTimer.remove(false);
-        this.enemies = null;
-        this.player = null;
-      });
+      this.addTextLabels();
+      this.addEvents();
     }
     addColliders() {
       this.physics.world.on("worldbounds", (body, up, down) => {
         if (down) {
           body.enable = false;
-          this.sound.play("ground");
+          this.sound.play("ground", { volume: SOUND_LEVELS.crash });
           this.prtCrash.emitParticle(10, body.x, body.y);
           if (body.width == this.player.width) {
             this.prtSmoke.x = this.player.x;
             this.prtSmoke.y = this.player.y;
             this.prtSmoke.emitting = true;
           }
+          this.cameras.main.shake(100, 0.01);
         }
       });
-      this.physics.add.collider(this.player.bullet, this.enemies.activeEnemies, (bullet, enemy) => {
+      const bulletCollider = this.physics.add.collider(this.player.bullet, this.enemies.activeEnemies, (bullet, enemy) => {
         bullet.reset();
         this.prtExplosion.emitParticle(40, enemy.x, enemy.y);
-        this.sound.play("explode");
+        this.sound.play("explode", { volume: SOUND_LEVELS.explode });
         this.enemies.explode(enemy);
-        this.updateScore(enemy.score);
+        this.hits++;
+        this.accuracy = Math.round(this.hits / this.totalShoots * 100) / 100;
+        this.updateScore(Math.round(HIT_SCORE * this.accuracy));
       });
       this.physics.add.collider(this.player, [this.enemies.bullets, ...this.enemies.activeEnemies], () => {
         this.prtExplosion.emitParticle(60, this.player.x, this.player.y);
         this.player.explode();
+        bulletCollider.active = false;
         this.enemiesShootTimer.remove(false);
         this.enemies.regroup();
         this.cameraFX.desaturateLuminance();
-        this.sound.play("explode", { rate: 0.5 });
+        this.sound.play("explode", { volume: SOUND_LEVELS.explode, rate: 0.5 });
         this.txtGameOver.setVisible(true);
+        if (this.score > this.best) {
+          this.best = this.score;
+          window.localStorage.setItem("best", this.score);
+          this.txtBest.setText(this.best);
+        }
         this.tweens.add({
           targets: this.txtGameOver,
           scale: 8,
           duration: 2e3,
           onComplete: () => {
+            this.sound.play("gameover");
             this.txtClick.setVisible(true);
             this.input.once("pointerdown", () => {
+              this.sound.stopAll();
               this.cameras.main.fadeOut(1e3);
               this.cameras.main.once("camerafadeoutcomplete", () => this.scene.start("menu"));
             });
@@ -834,9 +853,23 @@
         this.shields.hit(shield);
       });
     }
-    addHud() {
-      this.add.bitmapText(4, 4, "pixelfont", "score");
-      this.txtScore = this.add.bitmapText(44, 4, "pixelfont", "0");
+    addEvents() {
+      this.events.on("enemies-ready", this.onEnemiesReady, this);
+      this.events.on("player-shoot", () => this.totalShoots++);
+      this.events.once("shutdown", () => {
+        this.events.off("enemies-ready");
+        this.enemiesShootTimer.remove(false);
+        this.enemies = null;
+        this.player = null;
+      });
+    }
+    addTextLabels() {
+      this.add.bitmapText(20, 8, "pixelfont", "score").setOrigin(0.5).setDepth(100);
+      this.txtScore = this.add.bitmapText(20, 16 + 1, "pixelfont", "0").setOrigin(0.5).setDepth(100);
+      this.add.bitmapText(this.scale.width - 40, 8, "pixelfont", "high score").setOrigin(0.5).setDepth(100);
+      this.txtBest = this.add.bitmapText(this.scale.width - 40, 16 + 1, "pixelfont", this.best).setOrigin(0.5).setDepth(100);
+      this.txtGameOver = this.add.bitmapText(CENTER.x, CENTER.y - 40, "pixelfont", "game over").setVisible(false).setOrigin(0.5).setDepth(100);
+      this.txtClick = this.add.bitmapText(CENTER.x, CENTER.y + 20, "pixelfont", "click to return").setVisible(false).setOrigin(0.5).setDepth(100);
     }
     updateScore(points) {
       this.score += points;
@@ -862,7 +895,7 @@
     new EventSource("/esbuild").addEventListener("change", () => location.reload());
   }
   var COLORS2 = window.COLORS = {
-    background: "#f4f4f4",
+    background: "#0a0c0c",
     foreground: "#1a1c2c"
   };
   function runGame() {
