@@ -27,6 +27,9 @@ function runGame() {
                 debug: false,
             }
         },
+        input: {
+            gamepad: true
+        },
         scene: [Load, Menu, GamePlay],
     };
 
