@@ -136,6 +136,7 @@ export default class GamePlay extends Phaser.Scene {
             this.sound.play("explode", { volume: SOUND_LEVELS.explode, rate: 0.5 });
             this.txtGameOver.setVisible(true);
 
+
             if (this.score > this.best) {
                 this.best = this.score;
                 window.localStorage.setItem("best", this.score);
@@ -148,6 +149,8 @@ export default class GamePlay extends Phaser.Scene {
                 duration: 2000,
                 onComplete: () => {
                     this.sound.play("gameover");
+                    this.txtNewScore.setVisible(true)
+                        .setText("score " + this.score + " pts");
                     this.txtClick.setVisible(true);
                     this.input.once("pointerdown", () => {
                         this.sound.stopAll();
@@ -203,7 +206,11 @@ export default class GamePlay extends Phaser.Scene {
             .setVisible(false)
             .setOrigin(0.5)
             .setDepth(100);
-        this.txtClick = this.add.bitmapText(CENTER.x, CENTER.y + 20, "pixelfont", "click to return")
+        this.txtNewScore = this.add.bitmapText(CENTER.x, CENTER.y + 10, "pixelfont", "")
+            .setVisible(false)
+            .setOrigin(0.5)
+            .setScale(2);
+        this.txtClick = this.add.bitmapText(CENTER.x, CENTER.y + 40, "pixelfont", "click to return")
             .setVisible(false)
             .setOrigin(0.5)
             .setDepth(100);
