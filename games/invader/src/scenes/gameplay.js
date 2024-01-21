@@ -1,7 +1,7 @@
 import Player from "../custom-objs/player.js";
 import Enemies from "../custom-objs/enemies.js";
 import Shields from "../custom-objs/shields.js";
-import { SOUND_LEVELS } from "../utils.js";
+import { SOUND_LEVELS, getPan } from "../utils.js";
 
 const PRT_CONFIG_SHIELD = {
     frame: "Particle-yellow",
@@ -46,6 +46,7 @@ const PRT_CONFIG_CRASH = {
 };
 
 const HIT_SCORE = 200;
+const SND_HITS = ["shield_hit1", "shield_hit2", "shield_hit3"];
 
 export default class GamePlay extends Phaser.Scene {
     constructor() {
@@ -105,7 +106,7 @@ export default class GamePlay extends Phaser.Scene {
         this.physics.world.on("worldbounds", (body, up, down) => {
             if (down) {
                 body.enable = false;
-                this.sound.play("ground", { volume: SOUND_LEVELS.crash });
+                this.sound.play("ground", { volume: SOUND_LEVELS.crash, pan: getPan(body.x, this.scale.width) });
                 this.prtCrash.emitParticle(10, body.x, body.y);
                 if (body.width == this.player.width) {
                     this.prtSmoke.x = this.player.x;
@@ -119,7 +120,7 @@ export default class GamePlay extends Phaser.Scene {
         const bulletCollider = this.physics.add.collider(this.player.bullet, this.enemies.activeEnemies, (bullet, enemy) => {
             bullet.reset();
             this.prtExplosion.emitParticle(40, enemy.x, enemy.y);
-            this.sound.play("explode", { volume: SOUND_LEVELS.explode });
+            this.sound.play("explode", { volume: SOUND_LEVELS.explode, pan: getPan(enemy.x, this.scale.width) });
             this.enemies.explode(enemy);
             this.hits++;
             this.accuracy = Math.round((this.hits / this.totalShoots) * 100) / 100;
@@ -141,6 +142,7 @@ export default class GamePlay extends Phaser.Scene {
             this.prtShieldHit.setPosition(shield.x, shield.y - shield.height / 2);
             this.prtShieldHit.particleAngle = { min: -135, max: -45 };
             this.prtShieldHit.emitParticle(10);
+            this.sound.play(SND_HITS[Phaser.Math.Between(0, 2)], { volume: SOUND_LEVELS.metal, pan: getPan(shield.x, this.scale.width) });
             this.shields.hit(shield);
         });
 
@@ -149,6 +151,7 @@ export default class GamePlay extends Phaser.Scene {
             this.prtShieldHit.setPosition(shield.x, shield.y + shield.height / 2);
             this.prtShieldHit.particleAngle = { min: 135, max: 45 };
             this.prtShieldHit.emitParticle(10);
+            this.sound.play(SND_HITS[Phaser.Math.Between(0, 2)], { volume: SOUND_LEVELS.metal, pan: getPan(shield.x, this.scale.width) });
             this.shields.hit(shield);
         });
     }

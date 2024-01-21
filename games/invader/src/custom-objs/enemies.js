@@ -1,5 +1,5 @@
 import Bullet from "./bullet.js";
-import { genOscPositions, SOUND_LEVELS } from "../utils.js";
+import { genOscPositions, getPan, SOUND_LEVELS } from "../utils.js";
 
 const MOVE_RANGE = 14;
 const FPS = 12;
@@ -208,13 +208,13 @@ export default class Enemies {
         // Choose one front shooter 
         const shooter = Phaser.Math.RND.pick(shooters);
 
-        if(!shooter) return;
-        
+        if (!shooter) return;
+
         shooter.chain(["enemy_shoot", "enemy_idle"]);
         shooter.stop();
         let b = this.bullets.getFirst();
         if (b) {
-            this.scene.sound.play("enemy_shoot", { volume: SOUND_LEVELS.shoot });
+            this.scene.sound.play("enemy_shoot", { volume: SOUND_LEVELS.shoot, pan: getPan(shooter.x, this.scene.scale.width) });
             b.shoot(shooter.x, shooter.y);
         }
     }

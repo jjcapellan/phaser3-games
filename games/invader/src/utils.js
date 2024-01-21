@@ -20,3 +20,13 @@ export function genOscPositions(range) {
     range = Math.floor(range / 2);
     return ANIM_POSITIONS_OSC.map(position => range * position);
 }
+
+/**
+ * Calculates audio pan value for game object position
+ * @param {*} x Position of the sound (pixels)
+ * @param {*} width Width of the viewport (pixels)
+ * @returns number between -1 and 1
+ */
+export function getPan(x, width) {
+    return (2 * x - width) / width;
+}

@@ -1,7 +1,4 @@
-import { SOUND_LEVELS } from "../utils";
-
 const FRAMES = ["Shield-2", "Shield-1", "Shield-0"];
-const SND_HITS = ["shield_hit1", "shield_hit2", "shield_hit3"];
 const GROUPS = 8;
 const GROUP_SIZE = 4;
 
@@ -30,7 +27,6 @@ export default class Shields {
     }
 
     hit(shield) {
-        this.scene.sound.play(SND_HITS[Phaser.Math.Between(0, 2)], { volume: SOUND_LEVELS.metal });
         shield.energy--;
         if (shield.energy < 0) {
             this.activeShields.splice(this.activeShields.indexOf(shield), 1);
