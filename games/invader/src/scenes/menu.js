@@ -1,4 +1,5 @@
 import LayerFactory from "phaser3-scrollinglayer";
+import TextMenu from "../custom-objs/txtmenu";
 
 export default class Menu extends Phaser.Scene {
     constructor() {
@@ -76,13 +77,17 @@ export default class Menu extends Phaser.Scene {
             .setTint(0x1a1c2c)
             .setOrigin(0.5);
 
-        this.add.bitmapText(CENTER.x, CENTER.y / 3 + 40 * 2, "pixelfont", "press any key to play")
-            .setOrigin(0.5);
-
-        // Keyboard input
-        this.input.keyboard.once("keydown", () => {
-            this.changeScene();
-        });
+        this.menu = new TextMenu(this, CENTER.x, CENTER.y / 3 + 40 * 3, "pixelfont",
+            [
+                { name: "controls", fn: () => { } },
+                { name: "play", fn: this.changeScene }
+            ],
+            {
+                color: 0x566c86,
+                hoverColor: 0xb13e53,
+                padding: 8
+            });
+        this.menu.setScale(2);
     }
 
     changeScene() {
