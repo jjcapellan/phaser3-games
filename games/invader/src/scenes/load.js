@@ -28,6 +28,7 @@ export default class Load extends Phaser.Scene {
         this.load.audio("shield_hit3", "/assets/sounds/metal_crash3_22050.ogg");
         this.load.audio("gameover", "/assets/sounds/gameover1.ogg");
         this.load.audio("gamewin", "/assets/sounds/win.ogg");
+        this.load.audio("ui_pluck", "/assets/sounds/ui_pluck.ogg");
 
         this.load.on("progress", this.updateText, this);
 

@@ -8,6 +8,7 @@ export default class Menu {
         this.color = options.color || 0xcccccc;
         this.hoverColor = options.hoverColor || 0xffffff;
         this.padding = options.padding || 2;
+        this.hoverSound = options.hoverSound;
         this.buttons = [];
 
         this.createButtons();
@@ -28,6 +29,9 @@ export default class Menu {
 
             button.on("pointerover", () => {
                 button.setTint(this.hoverColor);
+                if(this.hoverSound){
+                    this.scene.sound.play(this.hoverSound);
+                }
             });
 
             button.on("pointerout", () => {

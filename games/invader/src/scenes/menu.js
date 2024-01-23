@@ -86,7 +86,8 @@ export default class Menu extends Phaser.Scene {
             {
                 color: 0x566c86,
                 hoverColor: 0xb13e53,
-                padding: 8
+                padding: 8,
+                hoverSound: "ui_pluck"
             });
         this.menu.setScale(2);
 
