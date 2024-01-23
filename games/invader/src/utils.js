@@ -30,3 +30,37 @@ export function genOscPositions(range) {
 export function getPan(x, width) {
     return (2 * x - width) / width;
 }
+
+/**
+ * Creates a simple rectangular image. This image is interactive so it blocks events 
+ * for objects behind it. This is especially useful for modal windows. 
+ * @param {Phaser.Scene} scene 
+ * @param {number} x 
+ * @param {number} y 
+ * @param {number} width 
+ * @param {number} height 
+ * @param {number} color 
+ * @param {number} alpha 
+ * @returns {Phaser.GameObjects.Image}
+ */
+export function addPanel(scene, x, y, width, height, color, alpha) {
+    let g = scene.panelGraphics;
+    if (!g) {
+        g = scene.add.graphics();
+    }
+
+    const key = "panel" + color + alpha;
+    if (!scene.textures.exists(key)) {
+        g.fillStyle(color, alpha);
+        g.fillRect(0, 0, 2, 2);
+        g.generateTexture(key, 2, 2);
+        g.setVisible(false);
+    }
+
+    let panel = scene.add.image(x, y, key)
+        .setDisplaySize(width, height)
+        .setSize(width, height)
+        .setInteractive();
+
+    return panel;
+}
