@@ -77,9 +77,10 @@ export default class Menu extends Phaser.Scene {
             .setTint(0x1a1c2c)
             .setOrigin(0.5);
 
+        // Menu
         this.menu = new TextMenu(this, CENTER.x, CENTER.y / 3 + 40 * 3, "pixelfont",
             [
-                { name: "controls", fn: () => { } },
+                { name: "controls", fn: this.showHowToPlay },
                 { name: "play", fn: this.changeScene }
             ],
             {
@@ -88,6 +89,16 @@ export default class Menu extends Phaser.Scene {
                 padding: 8
             });
         this.menu.setScale(2);
+
+        // Modal dialog background
+        this.panel = this.addPanel(CENTER.x, CENTER.y, 400, 290, 0x000000, 0.95)
+            .setVisible(false);
+        this.howToPlay = this.createHowToPlay().setOrigin(0.5).setPosition(CENTER.x, CENTER.y)
+            .setVisible(false);
+        this.panel.on("pointerdown", this.hideHowToPlay, this);
+        this.events.once("shutdown", () => {
+            this.events.off("pointerdown");
+        });
     }
 
     changeScene() {
@@ -96,6 +107,16 @@ export default class Menu extends Phaser.Scene {
         this.snd_background.stop();
         this.cameras.main.fadeOut(1000);
         this.cameras.main.once("camerafadeoutcomplete", () => this.scene.start("gameplay"));
+    }
+
+    showHowToPlay() {
+        this.panel.setVisible(true);
+        this.howToPlay.setVisible(true);
+    }
+
+    hideHowToPlay() {
+        this.panel.setVisible(false);
+        this.howToPlay.setVisible(false);
     }
 
     addShip(x, y, texture) {
@@ -121,6 +142,89 @@ export default class Menu extends Phaser.Scene {
         this.explode.setPosition(ship.x, ship.y);
         this.explode.emitParticle(40);
         ship.setVisible(false);
+    }
+
+    createHowToPlay() {
+        const rt = this.add.renderTexture(0, 0, 400, 290);
+        let cx = rt.width / 2;
+
+        let title = this.make.bitmapText({ font: "pixelfont", text: "how to play", scale: 3 }, false)
+            .setOrigin(0.5);
+        rt.draw(title, cx, 30);
+
+        let txt2 = this.make.bitmapText({
+            font: "pixelfont",
+            text: "player          enemy"
+        },
+            false)
+            .setOrigin(0.5);
+        rt.draw(txt2, cx, 56);
+
+        rt.drawFrame("atlas", "Player-0", 132, 70);
+        rt.drawFrame("atlas", "Enemy-0", 246, 66);
+
+        let txt3 = this.make.bitmapText({
+            font: "pixelfont",
+            text: "objective",
+            scale: 1,
+        }, false)
+            .setOrigin(0.5)
+            .setTint(0xffcd75);
+        rt.draw(txt3, cx, 115);
+
+        let txt4 = this.make.bitmapText({
+            font: "pixelfont",
+            text: "destroy all enemies.",
+            scale: 1,
+        }, false)
+            .setOrigin(0.5)
+            .setTint(0xababab);
+        rt.draw(txt4, cx, 130);
+
+        let txt5 = this.make.bitmapText({
+            font: "pixelfont",
+            text: "controls",
+            scale: 1,
+        }, false)
+            .setOrigin(0.5)
+            .setTint(0xffcd75);
+        rt.draw(txt5, cx, 155);
+
+        let txt6 = this.make.bitmapText({
+            font: "pixelfont",
+            text: "left  .......  a,left\n" +
+                "right ....... d,right\n" +
+                "shoot .......   space\n\n" +
+                "or use gamepad",
+            scale: 1,
+        }, false)
+            .setOrigin(0.5, 0)
+            .setTint(0xababab);
+        rt.draw(txt6, cx, 165);
+
+        return rt;
+    }
+
+    addPanel(x, y, width, height, color, alpha) {
+        let g = this.panelGraphics;
+        if (!g) {
+            g = this.add.graphics();
+        }
+
+        const key = "panel" + color + alpha;
+        if (!this.textures.exists(key)) {
+            g.fillStyle(color, alpha);
+            g.fillRect(0, 0, 2, 2);
+            g.generateTexture(key, 2, 2);
+            g.setVisible(false);
+        }
+
+        let panel = this.add.image(x, y, key)
+            .setDisplaySize(width, height)
+            .setSize(width, height)
+            .setInteractive();
+
+        return panel;
     }
 
     resetShip(ship) {
