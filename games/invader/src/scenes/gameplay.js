@@ -3,7 +3,7 @@ import Enemies from "../custom-objs/enemies.js";
 import Shields from "../custom-objs/shields.js";
 import { SOUND_LEVELS, getPan } from "../utils.js";
 
-const PRT_CONFIG_SHIELD = {
+const PART_SHIELD_CONF = {
     frame: "Particle-yellow",
     lifespan: 600,
     speed: { min: 10, max: 20 },
@@ -13,7 +13,7 @@ const PRT_CONFIG_SHIELD = {
     emitting: false
 };
 
-const PRT_CONFIG_SMOKE = {
+const PART_SMOKE_CONF = {
     frame: "Smoke-0",
     lifespan: 3000,
     scale: { start: 0.5, end: 0 },
@@ -24,7 +24,7 @@ const PRT_CONFIG_SMOKE = {
     emitting: false
 };
 
-const PRT_CONFIG_EXPLOSION = {
+const PART_EXPLOSION_CONF = {
     frame: "Particle-yellow",
     lifespan: 2000,
     speed: { min: 20, max: 90 },
@@ -35,7 +35,7 @@ const PRT_CONFIG_EXPLOSION = {
     rotate: { max: 359, min: 0 }
 };
 
-const PRT_CONFIG_CRASH = {
+const PART_CRASH_CONF = {
     frame: "Smoke-0",
     lifespan: 1000,
     speed: { min: 10, max: 20 },
@@ -47,6 +47,7 @@ const PRT_CONFIG_CRASH = {
 
 const HIT_SCORE = 200;
 const SND_HITS = ["shield_hit1", "shield_hit2", "shield_hit3"];
+const FADE_DURATION = 1000;
 
 export default class GamePlay extends Phaser.Scene {
     constructor() {
@@ -63,7 +64,7 @@ export default class GamePlay extends Phaser.Scene {
 
     create() {
         // Initial camera fadein effect
-        this.cameras.main.fadeIn(1000);
+        this.cameras.main.fadeIn(FADE_DURATION);
         // Initialize persistent high score
         const best = window.localStorage.getItem("best");
         if (best == null) {
@@ -76,19 +77,19 @@ export default class GamePlay extends Phaser.Scene {
         // Second image layer
         this.add.image(0, this.scale.height, "atlas", "Ruins3-0").setOrigin(0, 1).setTint(0x666666);
         // Player smoke effect after hit
-        this.prtSmoke = this.add.particles(49, this.scale.height - 20, "atlas", PRT_CONFIG_SMOKE);
+        this.prtSmoke = this.add.particles(49, this.scale.height - 20, "atlas", PART_SMOKE_CONF);
         // Player ship
         this.player = this.add.existing(new Player(this, CENTER.x, this.scale.height - 20));
         // Group of enemies
         this.enemies = new Enemies(this);
         // Shield hit effect
-        this.prtShieldHit = this.add.particles(0, 0, "atlas", PRT_CONFIG_SHIELD);
+        this.prtShieldHit = this.add.particles(0, 0, "atlas", PART_SHIELD_CONF);
         // Groups of shields
         this.shields = new Shields(this, this.player.y - 40);
         // Explosion effect
-        this.prtExplosion = this.add.particles(0, 0, "atlas", PRT_CONFIG_EXPLOSION);
+        this.prtExplosion = this.add.particles(0, 0, "atlas", PART_EXPLOSION_CONF);
         // Crash effect on the ground
-        this.prtCrash = this.add.particles(0, 0, "atlas", PRT_CONFIG_CRASH);
+        this.prtCrash = this.add.particles(0, 0, "atlas", PART_CRASH_CONF);
         // Front image layer
         this.add.image(0, this.scale.height, "atlas", "Floor-0").setOrigin(0, 1);
         // Colliders
@@ -212,7 +213,7 @@ export default class GamePlay extends Phaser.Scene {
 
     changeScene() {
         this.sound.stopAll();
-        this.cameras.main.fadeOut(1000);
+        this.cameras.main.fadeOut(FADE_DURATION);
         this.cameras.main.once("camerafadeoutcomplete", () => this.scene.start("menu"));
     }
 
