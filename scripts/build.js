@@ -3,7 +3,7 @@ import { inFile, outFile } from "./current.js";
 
 await esbuild.build({
     entryPoints: [
-        { out: "libphaser", in: "shared-libs/phaser.js" }
+        { out: "libphaser", in: "shared-libs/src/phaser.js" }
     ],
     bundle: true,
     format: "iife",
