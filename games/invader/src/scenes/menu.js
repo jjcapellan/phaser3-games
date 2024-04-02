@@ -70,7 +70,7 @@ export default class Menu extends Phaser.Scene {
 
         // Ships
         this.ships = [];
-        this.addShip(-50, -10, "Enemy_spin-0");
+        this.addShip(10, 20, "Enemy_spin-0");
         this.addShip(-200, -300, "Enemy_spin-0");
         this.addShip(-500, -550, "Enemy_spin-0");
 
