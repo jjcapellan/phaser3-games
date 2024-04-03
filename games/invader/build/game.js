@@ -303,7 +303,7 @@
   function getDistance(speed, deltaTime) {
     return deltaTime * speed / 1e3;
   }
-  if (true) {
+  if (false) {
     new EventSource("/esbuild").addEventListener("change", () => location.reload());
   }
   var src_default = LayerFactory;
@@ -485,7 +485,7 @@
       this.snd_background.play();
       this.add.image(0, 0, TEXTURE, "Background-0").setOrigin(0);
       this.ships = [];
-      this.addShip(-50, -10, "Enemy_spin-0");
+      this.addShip(10, 20, "Enemy_spin-0");
       this.addShip(-200, -300, "Enemy_spin-0");
       this.addShip(-500, -550, "Enemy_spin-0");
       this.explode = this.add.particles(0, 0, TEXTURE, PART_EXPLOSION_CONF);
@@ -1181,7 +1181,7 @@
   };
 
   // games/invader/src/index.js
-  if (true) {
+  if (false) {
     new EventSource("/esbuild").addEventListener("change", () => location.reload());
   }
   var COLORS2 = window.COLORS = {
@@ -1218,4 +1218,3 @@
     runGame();
   };
 })();
-//# sourceMappingURL=game.js.map
