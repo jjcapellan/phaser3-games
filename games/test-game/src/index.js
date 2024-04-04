@@ -27,6 +27,9 @@ function runGame() {
                 debug: false,
             }
         },
+        loader: {
+            baseURL: "../../assets/"
+        },
         scene: [Load, Menu, GamePlay],
     };
 

@@ -15,7 +15,7 @@ export default class Load extends Phaser.Scene {
             this.scene.start("menu");
         }, this);
 
-        this.load.image("font7x10", "/assets/imgs/font7x10.png");
+        this.load.image("font7x10", "imgs/font7x10.png");
 
         this.load.on("progress", this.updateText, this);
 
