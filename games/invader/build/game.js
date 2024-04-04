@@ -11,18 +11,18 @@
         this.createAnimations();
         this.scene.start("menu");
       }, this);
-      this.load.atlas("atlas", "/assets/imgs/invader.png", "/assets/imgs/invader.json");
-      this.load.audio("menu-background", "/assets/sounds/loop_space_ambience_128.mp3");
-      this.load.audio("player_shoot", "/assets/sounds/laser1.ogg");
-      this.load.audio("enemy_shoot", "/assets/sounds/laser2.ogg");
-      this.load.audio("explode", "/assets/sounds/expl_22050.ogg");
-      this.load.audio("ground", "/assets/sounds/ground.ogg");
-      this.load.audio("shield_hit1", "/assets/sounds/metal_crash1_22050.ogg");
-      this.load.audio("shield_hit2", "/assets/sounds/metal_crash2_22050.ogg");
-      this.load.audio("shield_hit3", "/assets/sounds/metal_crash3_22050.ogg");
-      this.load.audio("gameover", "/assets/sounds/gameover1.ogg");
-      this.load.audio("gamewin", "/assets/sounds/win.ogg");
-      this.load.audio("ui_pluck", "/assets/sounds/ui_pluck.ogg");
+      this.load.atlas("atlas", "imgs/invader.png", "imgs/invader.json");
+      this.load.audio("menu-background", "sounds/loop_space_ambience_128.mp3");
+      this.load.audio("player_shoot", "sounds/laser1.ogg");
+      this.load.audio("enemy_shoot", "sounds/laser2.ogg");
+      this.load.audio("explode", "sounds/expl_22050.ogg");
+      this.load.audio("ground", "sounds/ground.ogg");
+      this.load.audio("shield_hit1", "sounds/metal_crash1_22050.ogg");
+      this.load.audio("shield_hit2", "sounds/metal_crash2_22050.ogg");
+      this.load.audio("shield_hit3", "sounds/metal_crash3_22050.ogg");
+      this.load.audio("gameover", "sounds/gameover1.ogg");
+      this.load.audio("gamewin", "sounds/win.ogg");
+      this.load.audio("ui_pluck", "sounds/ui_pluck.ogg");
       this.load.on("progress", this.updateText, this);
     }
     // End preload()
@@ -1205,6 +1205,9 @@
       },
       input: {
         gamepad: true
+      },
+      loader: {
+        baseURL: "../../assets/"
       },
       scene: [Load, Menu2, GamePlay]
     };
