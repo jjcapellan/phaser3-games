@@ -30,6 +30,9 @@ function runGame() {
         input: {
             gamepad: true
         },
+        loader: {
+            baseURL: "../../assets/"
+        },
         scene: [Load, Menu, GamePlay],
     };
 
