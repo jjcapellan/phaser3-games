@@ -498,7 +498,7 @@
       this.menu = this.addMenu(MENU_X, MENU_Y);
       this.menu.setScale(2);
       this.panel = addPanel(this, CENTER.x, CENTER.y, MODAL_WIDTH, MODAL_HEIGHT, MODAL_BK_COLOR, 0.95).setVisible(false);
-      this.howToPlay = this.createHowToPlay().setOrigin(0.5).setPosition(CENTER.x, CENTER.y).setVisible(false);
+      this.howToPlay = this.createHowToPlay().setVisible(false);
       this.addEvents();
     }
     addEvents() {
@@ -555,45 +555,33 @@
       ship.setVisible(false);
     }
     createHowToPlay() {
-      const rt = this.add.renderTexture(0, 0, MODAL_WIDTH, MODAL_HEIGHT);
-      let cx = rt.width / 2;
-      let title = this.make.bitmapText({ font: FONT, text: "how to play", scale: 3 }, false).setOrigin(0.5);
-      rt.draw(title, cx, 30);
-      let txt2 = this.make.bitmapText(
-        {
-          font: FONT,
-          text: "player          enemy"
-        },
-        false
-      ).setOrigin(0.5);
-      rt.draw(txt2, cx, 56);
-      rt.drawFrame(TEXTURE, "Player-0", 132, 70);
-      rt.drawFrame(TEXTURE, "Enemy-0", 246, 66);
-      let txt3 = this.make.bitmapText({
-        font: FONT,
-        text: "objective",
-        scale: 1
-      }, false).setOrigin(0.5).setTint(MODAL_SUBTITLE_COLOR);
-      rt.draw(txt3, cx, 115);
-      let txt4 = this.make.bitmapText({
-        font: FONT,
-        text: "destroy all enemies.",
-        scale: 1
-      }, false).setOrigin(0.5).setTint(MODAL_TEXT_COLOR);
-      rt.draw(txt4, cx, 130);
-      let txt5 = this.make.bitmapText({
-        font: FONT,
-        text: "controls",
-        scale: 1
-      }, false).setOrigin(0.5).setTint(MODAL_SUBTITLE_COLOR);
-      rt.draw(txt5, cx, 155);
-      let txt6 = this.make.bitmapText({
-        font: FONT,
-        text: "left  .......  a,left\nright ....... d,right\nshoot .......   space\n\nor use gamepad",
-        scale: 1
-      }, false).setOrigin(0.5, 0).setTint(MODAL_TEXT_COLOR);
-      rt.draw(txt6, cx, 165);
-      return rt;
+      const c = this.add.container(0, 0);
+      const title = this.add.bitmapText(0, 30, FONT, "how to play").setScale(3).setOrigin(0.5);
+      c.add(title);
+      const txt2 = this.add.bitmapText(0, 56, FONT, "player          enemy").setOrigin(0.5);
+      c.add(txt2);
+      const img1 = this.add.image(-57, 74, TEXTURE, "Player-0");
+      c.add(img1);
+      const img2 = this.add.image(57, 72, TEXTURE, "Enemy-0");
+      c.add(img2);
+      const txt3 = this.add.bitmapText(0, 115, FONT, "objective").setOrigin(0.5).setTint(MODAL_SUBTITLE_COLOR);
+      c.add(txt3);
+      const txt4 = this.add.bitmapText(0, 130, FONT, "destroy all enemies").setOrigin(0.5).setTint(MODAL_TEXT_COLOR);
+      c.add(txt4);
+      let txt5 = this.add.bitmapText(0, 155, FONT, "controls").setOrigin(0.5).setTint(MODAL_SUBTITLE_COLOR);
+      c.add(txt5);
+      const txt6 = this.add.bitmapText(
+        0,
+        165,
+        FONT,
+        "left  .......  a,left\nright ....... d,right\nshoot .......   space\n\nor use gamepad"
+      ).setOrigin(0.5, 0).setTint(MODAL_TEXT_COLOR);
+      c.add(txt6);
+      const bounds = c.getBounds();
+      const x = Math.round(this.scale.width / 2 - bounds.width);
+      const y = Math.round((this.scale.height - bounds.height) / 2);
+      c.setPosition(this.scale.width / 2, y);
+      return c;
     }
     addPanel(x, y, width, height, color, alpha) {
       let g = this.panelGraphics;
