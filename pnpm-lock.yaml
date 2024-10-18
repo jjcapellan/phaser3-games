@@ -3,11 +3,11 @@ lockfileVersion: 5.4
 specifiers:
   esbuild: ^0.19.10
   eslint: ^8.56.0
-  phaser: ^3.70.0
+  phaser: 3.86.00
   phaser3-scrollinglayer: ^3.0.1
 
 dependencies:
-  phaser: 3.70.0
+  phaser: 3.86.0
   phaser3-scrollinglayer: 3.0.1
 
 devDependencies:
@@ -799,8 +799,8 @@ packages:
     engines: {node: '>=8'}
     dev: true
 
-  /phaser/3.70.0:
-    resolution: {integrity: sha512-2g+gh+Jp9f/Ho9FOXOYbIJMGf3UZXyMbW2iLScFaLQw11e/LqVyxj/YmaBauWbHabeTnZjiWkPklDnxhesMH0g==}
+  /phaser/3.86.0:
+    resolution: {integrity: sha512-A7rog3GhXYcWsPimteQmudyY6W0fx0eviOoo9Cwpzae1RPeJBDkhmWv5IFrQO9dL+T907E4dprQPnd2D4WhoEw==}
     dependencies:
       eventemitter3: 5.0.1
     dev: false

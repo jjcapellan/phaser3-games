@@ -15,7 +15,7 @@
   "author": "Juan José Capellán",
   "license": "MIT",
   "dependencies": {
-    "phaser": "^3.70.0",
+    "phaser": "3.86.00",
     "phaser3-scrollinglayer": "^3.0.1"
   },
   "devDependencies": {
